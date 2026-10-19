@@ -2,6 +2,7 @@
 
 **▶ Ver la presentación: <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/>**
 · Guion y tiempos: <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/guion.html>
+· PDF con las 29 diapositivas: [docs/IDEA-presentacion.pdf](docs/IDEA-presentacion.pdf) (se regenera con `python tools/export-pdf.py`)
 
 Presentación web interactiva, en formato de diapositivas 16:9, sobre el cifrador por bloques **IDEA** (Xuejia Lai y James L. Massey, ETH Zúrich, 1990–1992). Está pensada para una exposición universitaria de 15–20 minutos dividida en **cuatro bloques**.
 

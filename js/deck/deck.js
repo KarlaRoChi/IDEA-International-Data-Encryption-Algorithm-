@@ -495,6 +495,28 @@
     console.error(warn.textContent);
   }
 
+  // Modo exportación (?export): solo la diapositiva, sin interfaz ni animaciones
+  if (new URLSearchParams(location.search).has('export')) document.documentElement.classList.add('export-mode');
+
+  // ?export=all: todas las diapositivas una tras otra, para imprimir a PDF
+  if (new URLSearchParams(location.search).get('export') === 'all') {
+    document.documentElement.classList.add('print-all');
+    const book = document.createElement('div');
+    book.className = 'print-book';
+    document.body.appendChild(book);
+    slides.forEach((s) => {
+      const page = document.createElement('div');
+      page.className = 'print-page';
+      const el = build(s);
+      page.appendChild(el);
+      book.appendChild(page);
+      renderMath(el);
+      if (typeof s.mount === 'function') { try { s.mount(el.querySelector('.body') || el); } catch (e) { console.error(e); } }
+    });
+    window.DECK = { slides, printed: true };
+    return;
+  }
+
   buildChrome();
   fit();
   const start = parseInt(location.hash.slice(1), 10);
