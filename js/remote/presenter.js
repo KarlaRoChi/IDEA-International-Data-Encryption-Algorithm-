@@ -164,7 +164,7 @@
     if (!slide) return [];
     const root = slide.querySelector('.body') || slide;
     const out = [];
-    root.querySelectorAll('button, select, input[type=range]').forEach((el) => {
+    root.querySelectorAll('button, select, input[type=range], input[type=text], input:not([type])').forEach((el) => {
       if (el.closest('.slide-foot') || el.getClientRects().length === 0) return;   // oculto
       if (el.tagName === 'BUTTON') {
         out.push({ el, kind: 'b', l: labelOf(el), g: groupOf(el), d: el.disabled, on: isOn(el) });
@@ -174,33 +174,41 @@
           if (o.hidden || o.disabled) return;
           out.push({ el, kind: 'o', value: o.value, l: `${g}: ${clean(o.text)}`.slice(0, 60), g, on: o.selected && el.value === o.value });
         });
-      } else {
-        // Grupo = nombre del deslizador y su valor actual; botones − y +
+      } else if (el.type === 'range') {
+        // Deslizador real en el remoto: rango, paso, valor y cómo se muestra (10^12)
         const shown = el.parentElement && el.parentElement.querySelector('b');
-        // 10<sup>12</sup> -> «10^12»
-        const val = shown ? clean(shown.innerHTML.replace(/<sup>/g, '^').replace(/<[^>]+>/g, '')) : '';
-        const g = `${fieldLabel(el) || 'Ajuste'}${val ? ` · ${val}` : ''}`.slice(0, 60);
-        out.push({ el, kind: 'r-', l: '− menos', g, d: +el.value <= +el.min });
-        out.push({ el, kind: 'r+', l: '+ más', g, d: +el.value >= +el.max });
+        const vt = shown ? clean(shown.innerHTML.replace(/<sup>/g, '^').replace(/<[^>]+>/g, '')).slice(0, 30) : '';
+        out.push({ el, kind: 'r', l: (fieldLabel(el) || 'Ajuste').slice(0, 60), g: 'Ajustes',
+          min: +el.min || 0, max: +el.max || 100, step: +el.step || 1, v: el.value, vt });
+      } else if (!el.readOnly) {
+        // Campo de texto (clave, bloque…): editable desde el remoto
+        out.push({ el, kind: 't', l: (fieldLabel(el) || clean(el.getAttribute('aria-label')) || 'Texto').slice(0, 60), g: 'Datos',
+          v: el.value.slice(0, RP.MAX_TEXT), max: el.maxLength > 0 ? Math.min(el.maxLength, RP.MAX_TEXT) : RP.MAX_TEXT,
+          bad: el.classList.contains('invalid') });
       }
     });
     return out.slice(0, RP.MAX_ACTIONS);
   }
-  const publicActions = (list) => list.map((a) => ({ l: a.l, g: a.g, d: !!a.d, on: !!a.on }));
+  const publicActions = (list) => list.map((a) => {
+    const p = { l: a.l, g: a.g, d: !!a.d, on: !!a.on };
+    if (a.kind === 'r') Object.assign(p, { k: 'r', min: a.min, max: a.max, step: a.step, v: a.v, vt: a.vt });
+    if (a.kind === 't') Object.assign(p, { k: 't', v: a.v, max: a.max, bad: !!a.bad });
+    return p;
+  });
   function demoStatus() {
     const slide = document.querySelector('#stage .slide');
     const c = slide && slide.querySelector('.body .pos-counter');
     return c ? clean(c.textContent).slice(0, 80) : '';
   }
-  function runControl(a) {
+  function runControl(a, value) {
     const el = a.el;
     if (a.kind === 'b') el.click();
     else if (a.kind === 'o') { el.value = a.value; el.dispatchEvent(new Event('change', { bubbles: true })); }
-    else {
-      const step = +el.step || 1;
-      const v = Math.min(+el.max, Math.max(+el.min, +el.value + (a.kind === 'r+' ? step : -step)));
-      el.value = String(v);
+    else if (a.kind === 'r' || a.kind === 't') {
+      // Igual que si se escribiera o se moviera en la propia diapositiva
+      el.value = String(value);
       el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
     }
   }
 
@@ -313,7 +321,7 @@
       if (c && typeof c[r.action.op] === 'function') c[r.action.op]();
       soonCheck();
     } else if (r.action.type === 'demo-action') {
-      runControl(controls[r.action.index]);
+      runControl(controls[r.action.index], r.action.value);
       soonCheck();
     }
   }

@@ -124,6 +124,23 @@ test('DEMO_ACTION: ejecuta el control publicado si la etiqueta coincide y está 
   assert.equal(act(1, 'Paso ▶', 7000).reason, 'demo-desactivada');
 });
 
+test('DEMO_ACTION con valor: deslizadores dentro de su rango y textos sin caracteres de control', () => {
+  const h = new P.RemoteHost({ total: 10, allowDemo: true });
+  const actions = [{ l: 'Bits', k: 'r', min: 40, max: 256, step: 1, v: '128' }, { l: 'Clave', k: 't', max: 32, v: '' }, { l: 'Paso ▶' }];
+  let t = 0;
+  const go = (i, label, value) => h.handle(cmd(A, 'DEMO_ACTION', 0, undefined, { act: i, label, value }), (t += 1000), { actions });
+  assert.deepEqual(go(0, 'Bits', '64').action, { type: 'demo-action', index: 0, value: '64' });
+  assert.equal(go(0, 'Bits', '300').reason, 'valor');
+  assert.equal(go(0, 'Bits', 'abc').reason, 'valor');
+  assert.equal(go(0, 'Bits', undefined).reason, 'valor');
+  assert.deepEqual(go(1, 'Clave', '0001 0002').action, { type: 'demo-action', index: 1, value: '0001 0002' });
+  assert.equal(go(1, 'Clave', 'A'.repeat(33)).reason, 'valor');
+  assert.equal(go(1, 'Clave', 'ab\ncd').reason, 'valor');
+  assert.equal(go(2, 'Paso ▶', 'x').reason, 'valor', 'un botón no acepta valor');
+  assert.equal(h.handle({ ...cmd(A, 'DEMO_ACTION', 0, undefined, { act: 1, label: 'Clave' }), value: 'x'.repeat(201) }, (t += 1000), { actions }).reason, 'valor');
+  assert.equal(h.handle({ ...cmd(A, 'NEXT', 0), value: '1' }, (t += 1000)).reason, 'accion');
+});
+
 test('DEMO_ACTION de una diapositiva anterior (versión vieja) se rechaza', () => {
   const h = new P.RemoteHost({ total: 10, allowDemo: true });
   h.localChange(4);

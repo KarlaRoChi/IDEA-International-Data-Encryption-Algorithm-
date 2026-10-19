@@ -4,7 +4,7 @@ Fecha: 18 de octubre de 2026 · Node.js 24.21.0 · OpenSSL 3.5.9 · Windows 11.
 
 ## 1. Pruebas automáticas (`npm test`)
 
-**Resultado: 36 de 36 superadas** (16 de algoritmo y contenido, 16 de protocolo y 4 de cifrado del canal).
+**Resultado: 37 de 37 superadas** (16 de algoritmo y contenido, 17 de protocolo y 4 de cifrado del canal).
 
 ### Algoritmo (`tests/idea.test.js`)
 
@@ -73,7 +73,7 @@ Servidas desde una **subruta** (`http://localhost:8765/IDEA-International-Data-E
 
 ### Pruebas automáticas
 
-- `tests/remote.test.js` (incluidas en `npm test`): **13 de 13 superadas.** Cubren las acciones de cada comando, comandos inválidos, saltos fuera de rango, duplicados, ráfagas, pulsaciones simultáneas, órdenes absolutas, permisos de las demos, sesión cerrada, estados fuera de orden, reconexión y códigos de sala.
+- `tests/remote.test.js` (incluidas en `npm test`): **17 de 17 superadas.** Cubren las acciones de cada comando, comandos inválidos, saltos fuera de rango, duplicados, ráfagas, pulsaciones simultáneas, órdenes absolutas, permisos de las demos, sesión cerrada, estados fuera de orden, reconexión y códigos de sala.
 - `tools/test-supabase-sql.mjs`: **27 de 27 superadas** ejecutando `supabase/setup.sql` en PostgreSQL real (PGlite 0.2.17), con una simulación mínima de `auth.uid()`, `realtime.messages` y `realtime.topic()`.
 
 ### Casos pedidos
@@ -129,12 +129,16 @@ Pendiente: probar con **celulares reales** en otra red (datos móviles) el día 
 
 | Prueba | Resultado |
 |---|---|
-| Recorrido de las 29 diapositivas: controles que recibe el remoto | ✔ 16 diapositivas con controles: línea de tiempo (6), operaciones (5 ejemplos), leyes (2), división del bloque (2), subclaves (3), ronda (2), visualizador (16: Aleatorio, R1…R8, ½, Reiniciar, Ronda ⏮/⏭, Paso, Auto), ronda 1 (4), resumen (3), subclaves inversas (9), laboratorio (10: 4 ejemplos y 6 pasos), espacio de claves (2 deslizadores × −/+), capas (5), claves débiles (4), ataques (2 vistas y 9 filas), comparación (4 pestañas) |
+| Recorrido de las 29 diapositivas: controles que recibe el remoto | ✔ 16 diapositivas con controles: línea de tiempo (6), operaciones (5 ejemplos), leyes (2), división del bloque (2), subclaves (3), ronda (2), visualizador (16: Aleatorio, R1…R8, ½, Reiniciar, Ronda ⏮/⏭, Paso, Auto), ronda 1 (4), resumen (3), subclaves inversas (9), laboratorio (10: 4 ejemplos y 6 pasos), espacio de claves (2 deslizadores), capas (5), claves débiles (4), ataques (2 vistas y 9 filas), comparación (4 pestañas) |
 | Clic real en «Ronda ⏭» desde el remoto | ✔ Presentación en la ronda 2 (17 / 134). El remoto resalta R2 y muestra «17 / 134» |
 | «▷ Auto» desde el remoto | ✔ El remoto sigue la reproducción (33 → 38 en 3 s) y el botón cambia a «❚❚ Pausa». Un clic en «Pausa» la detiene |
 | Toques durante la reproducción automática | ✔ Los botones se actualizan en su sitio (el mismo elemento), así que un toque no se pierde |
 | Laboratorio desde el remoto: ejemplo «Todo ceros» → Ejecutar todo → Descifrar el resultado → Ejecutar todo | ✔ `0001 0001 0000 0000` (igual que OpenSSL) y «✓ Igual al original». «Descifrar» aparece desactivado cuando no aplica |
-| Deslizador «+ más» desde el remoto | ✔ 10^12 → 10^12.5 |
+| Deslizador real en el remoto (espacio de claves), arrastrado a la izquierda en vista de celular (375 px) | ✔ La presentación pasa de 10^12 a 10^7.5 y el remoto muestra «10^7.5» |
+| Campos de texto: diapositivas con campo detectado | ✔ 6: operaciones (2), división del bloque (1), subclaves (1), visualizador (2), laboratorio (2), claves débiles (1) |
+| Laboratorio: escribir «cafe babe dead beef» en «Bloque P» del remoto y pulsar Enter → «Ejecutar todo» | ✔ El campo cambia en la diapositiva, el laboratorio se recalcula y da `26C2 F9D0 F301 EFAA`, igual que `IDEA.encryptHex` |
+| Valor no válido («hola») en «Bloque P» | ✔ La diapositiva lo marca como no válido y desactiva los pasos; el campo del remoto aparece en rojo |
+| Pruebas unitarias del valor | ✔ Fuera de rango, no numérico, sin valor, texto demasiado largo, salto de línea, valor en un botón, valor > 200 caracteres y clave `value` en un comando de navegación |
 | Pestaña «Historia» de la comparación | ✔ Cambia en la presentación y queda resaltada en el remoto |
 | Pruebas unitarias nuevas | ✔ Etiqueta que no coincide, control desactivado, índice fuera de rango, control de una diapositiva anterior y estados de demo que no invalidan la navegación |
 | Errores de consola con la sesión abierta, recorriendo todas las demos | 0 |

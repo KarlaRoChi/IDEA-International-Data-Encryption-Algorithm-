@@ -121,24 +121,59 @@
       // «Ejemplos: Todo ceros» dentro del grupo «Ejemplos» se muestra como «Todo ceros»
       let l = String(a.l || '').slice(0, 80);
       if (l.startsWith(g + ': ')) l = l.slice(g.length + 2);
-      grp.items.push({ i, l, d: !!a.d, on: !!a.on });
+      grp.items.push({ i, l, d: !!a.d, on: !!a.on, k: a.k === 'r' || a.k === 't' ? a.k : 'b', a });
     });
     // Si solo cambió el estado de los botones, se actualizan en su sitio: rehacerlos
     // durante la reproducción automática podría «perder» un toque en el celular.
-    const shape = JSON.stringify(groups.map((g) => [g.g, g.items.map((x) => x.l)]));
+    const shape = JSON.stringify(groups.map((g) => [g.g, g.items.map((x) => [x.k, x.l])]));
     const box = $('demo-actions');
-    if (box.dataset.shape === shape) {
-      groups.forEach((g) => g.items.forEach((a) => {
-        const b = box.querySelector(`[data-act="${a.i}"]`);
-        if (b) { b.disabled = a.d; b.classList.toggle('on', a.on); }
-      }));
-      return;
+    if (box.dataset.shape !== shape) {
+      box.dataset.shape = shape;
+      box.innerHTML = groups.map((g) => `
+        <div class="rm-dgroup"><div class="rm-dgroup-h">${escapeHtml(g.g)}</div><div class="rm-dgroup-b">
+          ${g.items.map(itemHtml).join('')}
+        </div></div>`).join('');
     }
-    box.dataset.shape = shape;
-    box.innerHTML = groups.map((g) => `
-      <div class="rm-dgroup"><div class="rm-dgroup-h">${escapeHtml(g.g)}</div><div class="rm-dgroup-b">
-        ${g.items.map((a) => `<button class="rm-btn small${a.on ? ' on' : ''}" data-act="${a.i}" ${a.d ? 'disabled' : ''}>${escapeHtml(a.l)}</button>`).join('')}
-      </div></div>`).join('');
+    // Actualizar en su sitio (sin rehacer los elementos: no se pierden toques
+    // y no se borra lo que alguien esté escribiendo)
+    groups.forEach((g) => g.items.forEach((x) => {
+      if (x.k === 'b') {
+        const b = box.querySelector(`button[data-act="${x.i}"]`);
+        if (b) { b.disabled = x.d; b.classList.toggle('on', x.on); }
+      } else if (x.k === 'r') {
+        const w = box.querySelector(`[data-wrap="${x.i}"]`);
+        if (!w) return;
+        const r = w.querySelector('input');
+        if (document.activeElement !== r && !r.dataset.dragging) {
+          r.min = num(x.a.min, 0); r.max = num(x.a.max, 100); r.step = num(x.a.step, 1); r.value = String(x.a.v);
+        }
+        w.querySelector('.rm-rval').textContent = String(x.a.vt || x.a.v || '').slice(0, 30);
+      } else {
+        const w = box.querySelector(`[data-wrap="${x.i}"]`);
+        if (!w) return;
+        const t = w.querySelector('input');
+        if (document.activeElement !== t) t.value = String(x.a.v || '').slice(0, 200);
+        t.maxLength = num(x.a.max, 200);
+        w.classList.toggle('bad', !!x.a.bad);
+      }
+    }));
+  }
+  const num = (n, d) => (Number.isFinite(+n) ? +n : d);
+  function itemHtml(x) {
+    if (x.k === 'r') {
+      return `<div class="rm-range" data-wrap="${x.i}"><label><span>${escapeHtml(x.l)}</span><b class="rm-rval mono"></b></label>
+        <input type="range" data-range="${x.i}" aria-label="${escapeHtml(x.l)}" ${x.d ? 'disabled' : ''}></div>`;
+    }
+    if (x.k === 't') {
+      return `<form class="rm-text" data-wrap="${x.i}" data-text="${x.i}"><label for="rt${x.i}">${escapeHtml(x.l)}</label>
+        <div><input id="rt${x.i}" class="mono" spellcheck="false" autocapitalize="characters" autocomplete="off" ${x.d ? 'disabled' : ''}>
+        <button class="rm-btn small primary" type="submit">Enviar</button></div></form>`;
+    }
+    return `<button class="rm-btn small${x.on ? ' on' : ''}" data-act="${x.i}" ${x.d ? 'disabled' : ''}>${escapeHtml(x.l)}</button>`;
+  }
+  function sendValue(i, value) {
+    const a = tracker.state && Array.isArray(tracker.state.actions) ? tracker.state.actions[i] : null;
+    if (a) send('DEMO_ACTION', undefined, { act: i, label: a.l, value: String(value) });
   }
 
   function renderList() {
@@ -185,6 +220,31 @@
     }
     const s = e.target.closest('#slides button');
     if (s) { send('GOTO_SLIDE', +s.dataset.i); $('list').open = false; }
+  });
+  // Deslizadores: se envía al soltar (y, mientras se arrastra, como máximo 4 veces por segundo)
+  let rangeTimer = null;
+  document.addEventListener('input', (e) => {
+    const r = e.target.closest('[data-range]');
+    if (!r) return;
+    r.dataset.dragging = '1';
+    clearTimeout(rangeTimer);
+    rangeTimer = setTimeout(() => sendValue(+r.dataset.range, r.value), 250);
+  });
+  document.addEventListener('change', (e) => {
+    const r = e.target.closest('[data-range]');
+    if (!r) return;
+    clearTimeout(rangeTimer);
+    delete r.dataset.dragging;
+    sendValue(+r.dataset.range, r.value);
+  });
+  // Campos de texto: «Enviar» o tecla Enter
+  document.addEventListener('submit', (e) => {
+    const f = e.target.closest('[data-text]');
+    if (!f) return;
+    e.preventDefault();
+    const t = f.querySelector('input');
+    sendValue(+f.dataset.text, t.value.replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 200));
+    t.blur();
   });
   $('leave').addEventListener('click', () => end(true));
   $('again').addEventListener('click', () => show('join'));

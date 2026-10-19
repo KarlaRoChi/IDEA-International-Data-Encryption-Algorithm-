@@ -26,6 +26,10 @@
   const COMMANDS = new Set([...NAV, ...DEMO, 'DEMO_ACTION']);
   const RELATIVE = new Set(['NEXT', 'PREVIOUS', ...DEMO, 'DEMO_ACTION']);
   const MAX_ACTIONS = 80;
+  const MAX_TEXT = 200;
+  const CMD_KEYS = new Set(['t', 'v', 'id', 'from', 'cmd', 'base', 'slide', 'act', 'label', 'value']);
+  // Sin caracteres de control (tabulador, saltos de línea, nulos…)
+  const CTRL_RE = /[\u0000-\u001f\u007f]/;
   const ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
 
   // Alfabeto sin caracteres ambiguos (sin 0/O, 1/I/L) para códigos legibles
@@ -78,9 +82,11 @@
     if (m.cmd === 'DEMO_ACTION') {
       if (!isInt(m.act) || m.act < 0 || m.act >= MAX_ACTIONS) return 'accion';
       if (typeof m.label !== 'string' || m.label.length > 80) return 'accion';
-    } else if (m.act !== undefined || m.label !== undefined) return 'accion';
+      // value: nuevo valor de un deslizador o de un campo de texto
+      if (m.value !== undefined && (typeof m.value !== 'string' || m.value.length > MAX_TEXT)) return 'valor';
+    } else if (m.act !== undefined || m.label !== undefined || m.value !== undefined) return 'accion';
     const keys = Object.keys(m);
-    if (keys.length > 8) return 'formato';
+    if (keys.length > 9 || keys.some((k) => !CMD_KEYS.has(k))) return 'formato';
     return null;
   }
 
@@ -204,6 +210,17 @@
         // La etiqueta debe coincidir: evita ejecutar otro control si la lista cambió
         if (!a || a.l !== m.label) return { ok: false, reason: 'accion-desconocida' };
         if (a.d) return { ok: false, reason: 'accion-desactivada' };
+        if (a.k === 'r' || a.k === 't') {
+          if (typeof m.value !== 'string') return { ok: false, reason: 'valor' };
+          if (a.k === 'r') {
+            const v = Number(m.value);
+            if (!Number.isFinite(v) || v < a.min || v > a.max) return { ok: false, reason: 'valor' };
+          } else if (m.value.length > (a.max || MAX_TEXT) || CTRL_RE.test(m.value)) {
+            return { ok: false, reason: 'valor' };
+          }
+          return { ok: true, action: { type: 'demo-action', index: m.act, value: m.value } };
+        }
+        if (m.value !== undefined) return { ok: false, reason: 'valor' };
         return { ok: true, action: { type: 'demo-action', index: m.act } };
       }
 
@@ -261,12 +278,15 @@
   function makeCommand(from, cmd, base, slide, action) {
     const m = { t: 'CMD', v: PROTOCOL, id: randomId(9), from, cmd, base: base < 0 ? 0 : base };
     if (cmd === 'GOTO_SLIDE') m.slide = slide;
-    if (cmd === 'DEMO_ACTION' && action) { m.act = action.act; m.label = action.label; }
+    if (cmd === 'DEMO_ACTION' && action) {
+      m.act = action.act; m.label = action.label;
+      if (action.value !== undefined) m.value = String(action.value);
+    }
     return m;
   }
 
   return {
-    PROTOCOL, NAV, DEMO, CODE_ALPHABET, MAX_ACTIONS,
+    PROTOCOL, NAV, DEMO, CODE_ALPHABET, MAX_ACTIONS, MAX_TEXT,
     randomId, randomCode, normalizeCode, isValidCode,
     validateCommand, validateState, makeCommand,
     RemoteHost, StateTracker,
