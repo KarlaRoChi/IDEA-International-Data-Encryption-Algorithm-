@@ -393,3 +393,7 @@
 .proscons.compact .card { padding: 16px 22px; }
 .proscons.compact ul.clean > li { font-size: 21px; margin-bottom: 8px; }
 .proscons.compact h3 { font-size: 24px; }
+
+.title-team-name { margin-top: 26px; font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.title-team-name + .title-names { margin-top: 10px; }
+.title-names { display: grid; grid-template-columns: repeat(2, max-content); gap: 6px 48px; }

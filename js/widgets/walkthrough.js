@@ -74,7 +74,7 @@
       ({ next: () => go(s + 1), prev: () => go(s - 1), reset: () => go(0), all: () => go(15) })[b.dataset.a]();
     });
     render();
-    return { next: () => go(s + 1), prev: () => go(s - 1) };
+    return { next: () => go(s + 1), prev: () => go(s - 1), reset: () => go(0), all: () => go(15) };
   };
 
   W.RoundsSummary = function (container, opts = {}) {
@@ -112,6 +112,6 @@
       ({ next: () => go(shown + 1), prev: () => go(shown - 1), all: () => go(9) })[b.dataset.a]();
     });
     render();
-    return { next: () => go(shown + 1), prev: () => go(shown - 1) };
+    return { next: () => go(shown + 1), prev: () => go(shown - 1), reset: () => go(1), all: () => go(9) };
   };
 })();

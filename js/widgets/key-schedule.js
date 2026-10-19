@@ -138,6 +138,6 @@
       if (b.dataset.a === 'reset') { g = 0; render(); }
     });
     render();
-    return { next: () => step(1), prev: () => step(-1) };
+    return { next: () => step(1), prev: () => step(-1), reset: () => { g = 0; render(); }, all: () => { g = 6; render(); } };
   };
 })();

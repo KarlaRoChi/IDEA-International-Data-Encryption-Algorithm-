@@ -98,6 +98,9 @@
     document.querySelector('.rm-now').style.setProperty('--c', s.block ? `var(--p${s.block})` : 'var(--text-2)');
     bl.innerHTML = s.block ? `<i>${s.block}</i>${escapeHtml(blockName(s.block))}${s.pos ? ` <span>· ${escapeHtml(s.pos)}</span>` : ''}` : '<i>·</i>Apertura y cierre';
     $('demo').hidden = !s.demo;
+    const caps = s.caps && typeof s.caps === 'object' ? s.caps : {};
+    document.querySelector('[data-c="DEMO_RESET"]').disabled = !caps.reset;
+    document.querySelector('[data-c="DEMO_ALL"]').disabled = !caps.all;
     // Barra de progreso por bloques
     if (slides.length) {
       $('progress').innerHTML = slides.map((x) => `<span class="${x.i < s.slide ? 'done' : x.i === s.slide ? 'cur' : ''}" style="--c:${x.b ? `var(--p${x.b})` : 'var(--text-2)'}"></span>`).join('');

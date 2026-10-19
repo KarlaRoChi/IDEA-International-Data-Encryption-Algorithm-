@@ -122,6 +122,7 @@
       block: s.person || 0,
       pos: s.person ? `${s.posInSection}/${s.sectionSize}` : '',
       demo: !!(DECK.controller && typeof DECK.controller.next === 'function'),
+      caps: { reset: !!(DECK.controller && DECK.controller.reset), all: !!(DECK.controller && DECK.controller.all) },
     };
     const st = host.state(out);
     if (withIndex) {
@@ -183,13 +184,14 @@
   function onCommand(m) {
     if (!host) return;
     const s = DECK.slides[DECK.current];
-    const r = host.handle(m, Date.now(), { hasDemo: !!(DECK.controller && DECK.controller.next), slide: s });
+    const c0 = DECK.controller;
+    const r = host.handle(m, Date.now(), { hasDemo: !!(c0 && c0.next), caps: { reset: !!(c0 && c0.reset), all: !!(c0 && c0.all) }, slide: s });
     if (!r.ok) { if (r.reason !== 'obsoleto' && r.reason !== 'limite') console.info('Comando remoto rechazado:', r.reason, m && m.cmd); return; }
     if (!r.action) { publish(false); return; }
     if (r.action.type === 'goto') DECK.go(r.action.index, { source: 'remote' });   // dispara deck:change -> publish
     else if (r.action.type === 'demo') {
       const c = DECK.controller;
-      if (c) (r.action.dir > 0 ? c.next : c.prev).call(c);
+      if (c && typeof c[r.action.op] === 'function') c[r.action.op]();
     }
   }
 

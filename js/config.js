@@ -12,7 +12,13 @@ window.DECK_CONFIG = {
 
   // Integrantes del equipo: se muestran SOLO en la portada.
   // Formato: { name: 'Nombre Apellido', block: 1 }  (block = bloque que expone; opcional)
-  team: [],
+  teamName: 'Equipo 3',
+  team: [
+    { name: 'Calderón Gutiérrez Víctor Emiliano' },
+    { name: 'López López José Rodrigo' },
+    { name: 'Perez Rivas Evelyn Samantha' },
+    { name: 'Rojas Chimal Karla Beatriz' },
+  ],
 
   // Orden fijo de los cuatro bloques acordado por el equipo. No reordenar.
   presenters: [

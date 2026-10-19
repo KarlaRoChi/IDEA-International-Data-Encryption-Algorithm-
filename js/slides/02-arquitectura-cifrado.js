@@ -119,7 +119,7 @@
         root.querySelector('[data-a="next"]').onclick = () => go(s + 1);
         root.querySelector('[data-a="prev"]').onclick = () => go(s - 1);
         render();
-        return { next: () => go(s + 1), prev: () => go(s - 1) };
+        return { next: () => go(s + 1), prev: () => go(s - 1), reset: () => go(0), all: () => go(15) };
       },
       notes: String.raw`
         <p class="script">«Cada ronda usa seis subclaves y catorce operaciones en cuatro fases. Primero, cada palabra se combina con una subclave. Después, dos XOR producen p y q, que entran en la caja MA.»</p>

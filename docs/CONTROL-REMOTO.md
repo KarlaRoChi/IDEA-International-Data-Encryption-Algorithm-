@@ -23,7 +23,7 @@ Permite que los compañeros manejen la presentación desde su celular o computad
 
 | Mensaje | Quién lo envía | Contenido |
 |---|---|---|
-| `cmd` | remoto | `{ t:'CMD', v:1, id, from, cmd, base, slide? }`, donde `cmd` ∈ `NEXT`, `PREVIOUS`, `GOTO_SLIDE`, `GO_TO_START`, `GO_TO_END`, `DEMO_NEXT`, `DEMO_PREV` |
+| `cmd` | remoto | `{ t:'CMD', v:1, id, from, cmd, base, slide? }`, donde `cmd` ∈ `NEXT`, `PREVIOUS`, `GOTO_SLIDE`, `GO_TO_START`, `GO_TO_END`, `DEMO_NEXT`, `DEMO_PREV`, `DEMO_RESET`, `DEMO_ALL` |
 | `hello` | remoto | pide el estado actual (al entrar, al reconectar y al volver a la pestaña) |
 | `state` | presentadora | `{ epoch, version, slide, total, title, block, pos, demo, slides?, blocks? }` |
 | `closed` | presentadora | la sesión terminó |
@@ -41,7 +41,7 @@ Reglas de la presentadora (`RemoteHost`):
 | Desconexión | El remoto reintenta (Supabase reconecta solo), pide el estado con `hello` y avisa «sin presentador» si no recibe nada en 25 s (hay un latido cada 10 s) |
 | Sesión cerrada | La presentadora deja de aceptar comandos, avisa con `closed` y cierra la sala en el servidor |
 
-**Pasos de las demostraciones:** son opcionales. La presentadora los activa en el panel («Permitir pasos de las demostraciones»). Entonces, en las diapositivas con demo, el remoto muestra «◀ Paso / Paso ▶». Esos botones ejecutan los mismos `next/prev` que las teclas `.` y `,` y **nunca cambian de diapositiva**.
+**Pasos de las demostraciones:** son opcionales. La presentadora los activa en el panel («Permitir pasos de las demostraciones»). Entonces, en las diapositivas con demo, el remoto muestra «⟲ · ◀ Paso · Paso ▶ · Toda la ronda ⏩» (⟲ y ⏩ se activan solo si la demo los admite). Esos botones ejecutan los mismos `next/prev` que las teclas `.` y `,` y **nunca cambian de diapositiva**.
 
 ## Configurar Supabase (una vez, unos 10 minutos)
 

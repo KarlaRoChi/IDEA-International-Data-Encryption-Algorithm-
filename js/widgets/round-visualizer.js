@@ -159,6 +159,6 @@
     }));
 
     if (compute()) render();
-    return { next: () => { stop(); go(p + 1); }, prev: () => { stop(); go(p - 1); }, destroy: stop };
+    return { next: () => { stop(); go(p + 1); }, prev: () => { stop(); go(p - 1); }, reset: () => { stop(); go(0); }, all: () => { stop(); goRound(1); }, destroy: stop };
   };
 })();

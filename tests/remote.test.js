@@ -71,7 +71,10 @@ test('pasos de demo: solo si el presentador los permite y la diapositiva tiene d
   assert.equal(h.handle(cmd(A, 'DEMO_NEXT', 0), 1000, { hasDemo: true }).reason, 'demo-desactivada');
   h.allowDemo = true;
   assert.equal(h.handle(cmd(A, 'DEMO_NEXT', 0), 2000, { hasDemo: false }).reason, 'sin-demo');
-  assert.deepEqual(h.handle(cmd(A, 'DEMO_NEXT', 0), 3000, { hasDemo: true }).action, { type: 'demo', dir: 1 });
+  assert.deepEqual(h.handle(cmd(A, 'DEMO_NEXT', 0), 3000, { hasDemo: true }).action, { type: 'demo', op: 'next' });
+  assert.equal(h.handle(cmd(A, 'DEMO_ALL', 0), 4000, { hasDemo: true, caps: {} }).reason, 'sin-accion');
+  assert.deepEqual(h.handle(cmd(A, 'DEMO_ALL', 0), 5000, { hasDemo: true, caps: { all: true } }).action, { type: 'demo', op: 'all' });
+  assert.deepEqual(h.handle(cmd(A, 'DEMO_RESET', 0), 6000, { hasDemo: true, caps: { reset: true } }).action, { type: 'demo', op: 'reset' });
   assert.equal(h.index, 0, 'un paso de demo no cambia de diapositiva');
 });
 

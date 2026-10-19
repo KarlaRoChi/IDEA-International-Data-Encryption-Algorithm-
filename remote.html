@@ -40,9 +40,13 @@
     </section>
 
     <section class="rm-demo" id="demo" hidden>
-      <span>Demostración</span>
-      <button class="rm-btn small" data-c="DEMO_PREV" aria-label="Paso anterior de la demostración">◀ Paso</button>
-      <button class="rm-btn small" data-c="DEMO_NEXT" aria-label="Paso siguiente de la demostración">Paso ▶</button>
+      <span>Demostración · no cambia de diapositiva</span>
+      <div class="rm-demo-btns">
+        <button class="rm-btn small" data-c="DEMO_RESET" aria-label="Reiniciar la demostración">⟲</button>
+        <button class="rm-btn small" data-c="DEMO_PREV" aria-label="Paso anterior de la demostración">◀ Paso</button>
+        <button class="rm-btn small primary" data-c="DEMO_NEXT" aria-label="Paso siguiente de la demostración">Paso ▶</button>
+        <button class="rm-btn small" data-c="DEMO_ALL" aria-label="Completar la ronda">Toda la ronda ⏩</button>
+      </div>
     </section>
 
     <details class="rm-list" id="list">

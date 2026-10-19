@@ -215,7 +215,7 @@
     }));
 
     startEncrypt();
-    return { next: () => T && go(p + 1), prev: () => T && go(p - 1) };
+    return { next: () => T && go(p + 1), prev: () => T && go(p - 1), reset: () => startEncrypt(), all: () => T && nextRound() };
   };
 
   /* ------------------------------------------------------------------ */
@@ -250,6 +250,6 @@
     }
     el.addEventListener('click', (e) => { const b = e.target.closest('.rail-btn'); if (b) { sel = +b.dataset.r; render(); } });
     render();
-    return { next: () => { sel = Math.min(8, sel + 1); render(); }, prev: () => { sel = Math.max(0, sel - 1); render(); } };
+    return { next: () => { sel = Math.min(8, sel + 1); render(); }, prev: () => { sel = Math.max(0, sel - 1); render(); }, reset: () => { sel = 0; render(); }, all: () => { sel = 8; render(); } };
   };
 })();

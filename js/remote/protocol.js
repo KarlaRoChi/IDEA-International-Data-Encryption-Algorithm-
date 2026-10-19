@@ -20,9 +20,9 @@
 
   const PROTOCOL = 1;
   const NAV = ['NEXT', 'PREVIOUS', 'GOTO_SLIDE', 'GO_TO_START', 'GO_TO_END'];
-  const DEMO = ['DEMO_NEXT', 'DEMO_PREV'];
+  const DEMO = ['DEMO_NEXT', 'DEMO_PREV', 'DEMO_RESET', 'DEMO_ALL'];
   const COMMANDS = new Set([...NAV, ...DEMO]);
-  const RELATIVE = new Set(['NEXT', 'PREVIOUS', 'DEMO_NEXT', 'DEMO_PREV']);
+  const RELATIVE = new Set(['NEXT', 'PREVIOUS', ...DEMO]);
   const ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
 
   // Alfabeto sin caracteres ambiguos (sin 0/O, 1/I/L) para códigos legibles
@@ -138,6 +138,7 @@
         slide: this.index, total: this.total, ts: Date.now(),
         title: meta.title || '', block: meta.block || 0, pos: meta.pos || '',
         demo: !!(meta.demo && this.allowDemo),
+        caps: meta.demo && this.allowDemo ? { reset: !!(meta.caps && meta.caps.reset), all: !!(meta.caps && meta.caps.all) } : null,
       };
     }
 
@@ -173,10 +174,13 @@
 
       if (RELATIVE.has(m.cmd) && m.base < this.version) return { ok: false, reason: 'obsoleto' };
 
-      if (m.cmd === 'DEMO_NEXT' || m.cmd === 'DEMO_PREV') {
+      if (DEMO.includes(m.cmd)) {
         if (!this.allowDemo) return { ok: false, reason: 'demo-desactivada' };
         if (!ctx.hasDemo) return { ok: false, reason: 'sin-demo' };
-        return { ok: true, action: { type: 'demo', dir: m.cmd === 'DEMO_NEXT' ? 1 : -1 } };
+        const op = { DEMO_NEXT: 'next', DEMO_PREV: 'prev', DEMO_RESET: 'reset', DEMO_ALL: 'all' }[m.cmd];
+        // ⟲ y ⏩ solo si la demostración de esta diapositiva los ofrece
+        if ((op === 'reset' || op === 'all') && !(ctx.caps && ctx.caps[op])) return { ok: false, reason: 'sin-accion' };
+        return { ok: true, action: { type: 'demo', op } };
       }
 
       let target;
