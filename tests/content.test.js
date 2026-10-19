@@ -40,12 +40,12 @@ test('cada bloque empieza con portada, termina con transición y tiene alguna de
   }
 });
 
-test('duración total 30–40 min y bloques equilibrados (≈8 min, ±1)', () => {
+test('duración total 15–20 min y bloques equilibrados (≈4,5 min, ±1)', () => {
   const total = S.reduce((a, s) => a + s.minutes, 0);
-  assert.ok(total >= 30 && total <= 40, `total ${total}`);
+  assert.ok(total >= 15 && total <= 20, `total ${total}`);
   for (const p of [1, 2, 3, 4]) {
     const m = mins(p);
-    assert.ok(m >= 7 && m <= 9, `bloque ${p}: ${m} min`);
+    assert.ok(m >= 3.5 && m <= 5.5, `bloque ${p}: ${m} min`);
   }
 });
 

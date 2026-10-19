@@ -3,9 +3,9 @@
 **▶ Ver la presentación: <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/>**
 · Guion y tiempos: <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/guion.html>
 
-Presentación web interactiva, en formato de diapositivas 16:9, sobre el cifrador por bloques **IDEA** (Xuejia Lai y James L. Massey, ETH Zúrich, 1990–1992). Está pensada para una exposición universitaria de 30–40 minutos dividida en **cuatro bloques**.
+Presentación web interactiva, en formato de diapositivas 16:9, sobre el cifrador por bloques **IDEA** (Xuejia Lai y James L. Massey, ETH Zúrich, 1990–1992). Está pensada para una exposición universitaria de 15–20 minutos dividida en **cuatro bloques**.
 
-- **37 diapositivas · 33,5 min previstos** (≈ 8 min por bloque). Ver el [mapa y el guion](docs/GUION.md).
+- **29 diapositivas · 18 min previstos** (≈ 4,5 min por bloque). Ver el [mapa y el guion](docs/GUION.md).
 - Implementación **real** de IDEA (bloque de 64 bits, clave de 128 bits, 8,5 rondas), validada con el vector de prueba publicado por Lai (1992) y con **100 vectores independientes generados con OpenSSL**.
 - Sitio **100 % estático**: HTML, CSS y JavaScript sin compilación, sin servidor propio y sin claves privadas. Funciona en GitHub Pages bajo la ruta del proyecto e incluso abriendo `index.html` con doble clic.
 
@@ -14,9 +14,9 @@ Presentación web interactiva, en formato de diapositivas 16:9, sobre el cifrado
 | Bloque | Contenido | Interacciones |
 |---|---|---|
 | 1 · Contexto y fundamentos | Qué es IDEA, historia (PES → IPES → IDEA), limitaciones de DES, PGP, los tres grupos algebraicos y el tratamiento del 0 | Línea de tiempo, laboratorio de ⊕ ⊞ ⊙ sobre bits, comprobador de leyes algebraicas |
-| 2 · Arquitectura y cifrado | 64/128 bits, división en X1…X4, 52 subclaves y rotación de 25 bits, organización de la ronda, caja MA, 8 + ½ rondas | División del bloque, planificación de claves animada, diagrama de ronda, **visualizador de cifrado ronda a ronda**, difusión de un bit |
+| 2 · Arquitectura y cifrado | 64/128 bits, división en X1…X4, 52 subclaves y rotación de 25 bits, organización de la ronda, caja MA, 8 + ½ rondas | División del bloque, planificación de claves animada, diagrama de ronda, **visualizador de cifrado ronda a ronda** |
 | 3 · Ejemplo práctico y descifrado | Vector de Lai paso a paso, rondas 2–8, transformación final, descifrado, subclaves inversas y reordenadas | Ronda 1 operación a operación, resumen de rondas, tabla de subclaves de descifrado, **laboratorio de cifrado y descifrado** |
-| 4 · Criptoanálisis y seguridad | Espacio de claves, seguridad teórica vs práctica, claves débiles, ataques publicados, ventajas y desventajas, patentes, transición a AES, relevancia actual | Calculadora del espacio de claves, capas de seguridad, detector de subclaves triviales, gráfico de ataques (rondas y coste), bits de clave por ronda, comparación DES/IDEA/AES |
+| 4 · Criptoanálisis y seguridad | Espacio de claves, seguridad teórica vs práctica, claves débiles, ataques publicados, ventajas y desventajas, patentes, transición a AES, relevancia actual | Calculadora del espacio de claves, capas de seguridad, detector de subclaves triviales, gráfico de ataques (rondas y coste), comparación DES/IDEA/AES |
 
 Para no repetir contenido, el bloque 2 usa su propio ejemplo (texto «IDEA1991», clave «XuejiaLai&Massey») y explica la **estructura**. El bloque 3 hace el **cálculo numérico completo** con el vector publicado y explica el **descifrado**.
 

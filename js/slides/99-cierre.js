@@ -7,7 +7,7 @@
     person: 0,
     title: 'Preguntas · Bibliografía',
     kicker: 'Gracias',
-    minutes: 0.5,
+    minutes: 0.3,
     html: '<div class="biblio"></div>',
     mount: (root) => {
       const list = window.REFS.list;

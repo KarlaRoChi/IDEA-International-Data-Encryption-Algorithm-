@@ -8,7 +8,7 @@
     person: 0,
     type: 'raw',
     title: 'Portada',
-    minutes: 0.5,
+    minutes: 0.3,
     className: 'title-slide',
     html: String.raw`
       <div class="title-wrap">
@@ -21,6 +21,7 @@
         <h1 class="title-main">IDEA</h1>
         <p class="title-sub">${C.subtitle}</p>
         <p class="title-desc">Un cifrador por bloques construido mezclando tres operaciones algebraicas incompatibles</p>
+        ${C.team && C.team.length ? `<div class="title-names">${C.team.map((m) => `<span${m.block ? ` style="--c:var(--p${m.block})"` : ''}>${m.block ? `<i>${m.block}</i>` : ''}${m.name}</span>`).join('')}</div>` : ''}
         <div class="title-team">
           ${C.presenters.map((p) => `<div class="tt" style="--c:${p.color}"><b>${p.id}</b><span>${p.block}</span></div>`).join('')}
         </div>

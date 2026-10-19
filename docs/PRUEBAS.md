@@ -26,7 +26,7 @@ Fecha: 18 de octubre de 2026 · Node.js 24.21.0 · OpenSSL 3.5.9 · Windows 11.
 | `index.html` carga los archivos de diapositivas en el orden acordado | ✔ |
 | Orden estricto de los bloques: portada → 1 → 2 → 3 → 4 → cierre, sin intercalar | ✔ |
 | Cada bloque empieza con portada (identifica el bloque), termina con conclusión y transición al siguiente y tiene al menos una interacción | ✔ |
-| Duración total entre 30 y 40 min y cada bloque entre 7 y 9 min | ✔ (33,5 min; 8,2 / 8,1 / 8,3 / 7,9) |
+| Duración total entre 15 y 20 min y cada bloque entre 3,5 y 5,5 min | ✔ (18,0 min; 4,3 / 4,4 / 4,4 / 4,3) |
 | Todas las diapositivas tienen título, tiempo y notas | ✔ |
 | Todas las citas existen, todas las referencias se citan y todas tienen URL https | ✔ |
 | Identificadores únicos | ✔ |
@@ -37,7 +37,6 @@ Fecha: 18 de octubre de 2026 · Node.js 24.21.0 · OpenSSL 3.5.9 · Windows 11.
 | Verificación | Resultado |
 |---|---|
 | Ejemplo de el bloque 2 (P = 4944 4541 3139 3931, K = 5875…6579) cifrado con OpenSSL | `D135 E4D6 C1FE 336D`, igual al visualizador |
-| Mapa de bits de clave por ronda (bloque 4) frente a la planificación real de claves (200 claves aleatorias) | 0 discrepancias |
 | Cifras del bloque 4: 2¹²⁸ / 2¹²⁶·⁰⁶ ≈ 3,8; con 10¹⁸ claves/s, 2¹²⁸ → ≈ 1,1·10¹³ años (≈ 781 × edad del universo); al máximo de los deslizadores (10²⁴ claves/s) → ≈ 1,1·10⁷ años | Comprobado numéricamente; las notas se corrigieron para reflejarlo |
 | DOI de la bibliografía (Crossref) y metadatos de los RFC (rfc-editor.org) | Todos resuelven, con título y páginas coincidentes |
 
@@ -47,7 +46,7 @@ Servidas desde una **subruta** (`http://localhost:8765/IDEA-International-Data-E
 
 | Prueba | Resultado |
 |---|---|
-| Carga de las 37 diapositivas, CSS, JS y KaTeX | ✔ |
+| Carga de las 29 diapositivas, CSS, JS y KaTeX | ✔ |
 | Errores de consola al montar todas las diapositivas y avanzar 200 pasos en cada demo | 0 errores |
 | Fórmulas KaTeX (`.katex-error`) | 0 errores |
 | Contenido desbordado del escenario 16:9 | Ninguno visible (solo los nodos MathML ocultos de KaTeX) |
@@ -61,7 +60,7 @@ Servidas desde una **subruta** (`http://localhost:8765/IDEA-International-Data-E
 | Vista del presentador (redirigida a un `iframe`, porque el navegador de pruebas bloquea ventanas emergentes): título, notas, siguiente diapositiva, tiempo del bloque (00:00 / 08:18) y botones que controlan la presentación | ✔ |
 | Cronómetro (`T` / clic): cuenta el tiempo | ✔ |
 | Apertura directa con `file://` (Edge sin interfaz): diapositivas, demos y KaTeX | ✔ |
-| Resolución 1920×1080 (Edge sin interfaz), diapositivas 8, 14, 15, 30 y 37 | ✔ Legibles y sin solapamientos tras ajustar la etiqueta «caja MA» |
+| Resolución 1920×1080 (Edge sin interfaz), diapositivas condensadas de los cuatro bloques | ✔ Legibles y sin solapamientos |
 
 ## 4. Limitaciones conocidas
 

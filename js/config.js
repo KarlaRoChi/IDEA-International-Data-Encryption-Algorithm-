@@ -7,8 +7,12 @@ window.DECK_CONFIG = {
   title: 'IDEA',
   subtitle: 'International Data Encryption Algorithm',
   course: 'Criptografía · Exposición grupal',
-  // Duración objetivo de la exposición, en minutos (sin preguntas).
-  targetMinutes: 34,
+  // Duración objetivo de la exposición, en minutos (sin preguntas): 15–20 min.
+  targetMinutes: 18,
+
+  // Integrantes del equipo: se muestran SOLO en la portada.
+  // Formato: { name: 'Nombre Apellido', block: 1 }  (block = bloque que expone; opcional)
+  team: [],
 
   // Orden fijo de los cuatro bloques acordado por el equipo. No reordenar.
   presenters: [
