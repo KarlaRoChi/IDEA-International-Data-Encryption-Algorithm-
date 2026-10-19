@@ -4,7 +4,7 @@ Fecha: 18 de octubre de 2026 · Node.js 24.21.0 · OpenSSL 3.5.9 · Windows 11.
 
 ## 1. Pruebas automáticas (`npm test`)
 
-**Resultado: 16 de 16 superadas.**
+**Resultado: 33 de 33 superadas** (16 de algoritmo y contenido, 13 de protocolo y 4 de cifrado del canal).
 
 ### Algoritmo (`tests/idea.test.js`)
 
@@ -107,3 +107,20 @@ Después de configurar `js/remote-config.js`:
 4. Activa y desactiva el modo avión del celular: al volver debe mostrar la diapositiva actual.
 5. Abre `remote.html` en una ventana privada y escribe un código inventado 9 veces. Debe aparecer «Demasiados intentos».
 6. Pulsa «Cerrar sesión». Los celulares deben mostrar «Sesión terminada» y no poder enviar más comandos.
+
+### Modo internet sin configuración (MQTT público cifrado)
+
+Probado el 19 de octubre de 2026 con el servidor público `broker.hivemq.com` (conexión real por internet, no `BroadcastChannel`):
+
+| Caso | Resultado |
+|---|---|
+| El presentador crea la sala | ✔ «Internet · canal cifrado de extremo a extremo», estado «conectado» y enlace `remote.html#c=…&m=mq` |
+| El remoto entra con el enlace y recibe el estado y la lista de 29 diapositivas | ✔ |
+| Clic real en «Siguiente» en el remoto | ✔ La presentación cambia en < 0,5 s y el contador marca 1 dispositivo |
+| **Proceso independiente** (un remoto en Node.js, fuera del navegador) conectado al mismo servidor | ✔ Recibe el estado, envía «ir a la diapositiva 11» y la presentación cambia. El otro remoto, en el navegador, también ve la diapositiva 11 |
+| Mensaje sin cifrar inyectado en el tema | ✔ Ignorado: la presentación no se movió |
+| «Cerrar sesión» | ✔ El remoto muestra «Sesión terminada» |
+| Casilla «Modo ensayo» | ✔ Crea una sala local (`m=local`) |
+| `tests/securechannel.test.js` | ✔ 4 de 4: tema determinista que no revela el código, ida y vuelta, IV aleatorio, rechazo de mensajes alterados, falsos o con otra clave |
+
+Pendiente: probar con **celulares reales** en otra red (datos móviles) el día del ensayo. El canal es el mismo que en la prueba anterior, pero no se ha ejecutado desde un teléfono.

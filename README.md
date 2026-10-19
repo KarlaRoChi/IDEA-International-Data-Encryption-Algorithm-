@@ -23,7 +23,7 @@ Para no repetir contenido, el bloque 2 usa su propio ejemplo (texto «IDEA1991»
 
 ## Control remoto colaborativo
 
-Los compañeros pueden pasar las diapositivas desde su celular o computadora mientras la presentadora comparte pantalla: botón **Control remoto** (tecla `R`) → **«Iniciar sesión de presentación»** → QR, enlace o código de 8 caracteres. Funciona por internet con **Supabase Realtime** (configuración única, sin servidor propio). Sin configurar, queda en *modo ensayo* (pestañas del mismo navegador). Arquitectura, configuración, seguridad y pruebas: [docs/CONTROL-REMOTO.md](docs/CONTROL-REMOTO.md).
+Los compañeros pueden pasar las diapositivas desde su celular o computadora mientras la presentadora comparte pantalla: botón **Control remoto** (tecla `R`) → **«Iniciar sesión de presentación»** → QR, enlace o código de 8 caracteres. **Funciona por internet sin configurar nada**: los mensajes pasan por un servidor MQTT público, cifrados de extremo a extremo con una clave derivada del código de la sala. Opcionalmente se puede usar **Supabase Realtime**, que añade control de acceso en el servidor, y hay un *modo ensayo* sin internet. Arquitectura, configuración, seguridad y pruebas: [docs/CONTROL-REMOTO.md](docs/CONTROL-REMOTO.md).
 
 ## Ejecutar en local
 
@@ -110,7 +110,7 @@ tools/                     Generación de vectores y exportación del guion
 docs/GUION.md              Guion y tiempos (generado)
 docs/PRUEBAS.md            Pruebas realizadas y resultados
 vendor/katex/              KaTeX 0.16.11 (licencia MIT), incluido para uso sin conexión
-vendor/supabase/, qrcode/  supabase-js 2.49.4 y qrcode-generator 1.4.4 (MIT)
+vendor/supabase/, qrcode/, mqtt/  supabase-js 2.49.4, qrcode-generator 1.4.4 y mqtt.js 5.10.1 (MIT)
 ```
 
 ## Nota sobre la implementación

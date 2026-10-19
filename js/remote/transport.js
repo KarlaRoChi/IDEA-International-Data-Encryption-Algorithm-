@@ -187,17 +187,147 @@
     }
   }
 
-  /** Elige el transporte según la configuración pública. */
-  function createTransport(role, mode) {
-    const cfg = window.REMOTE_CONFIG || {};
-    const hasSupabase = !!(cfg.supabaseUrl && cfg.supabaseAnonKey);
-    if (mode === 'local' || !hasSupabase) return new LocalTransport(role);
-    return new SupabaseTransport(role, cfg);
+  /* ------------------------------------------------------------------ */
+  /* Transporte MQTT público con cifrado de extremo a extremo (internet,  */
+  /* sin cuentas ni configuración)                                       */
+  /* ------------------------------------------------------------------ */
+  const loaded = {};
+  function loadScript(src, globalName) {
+    if (window[globalName]) return Promise.resolve();
+    if (!loaded[src]) {
+      loaded[src] = new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = () => res();
+        s.onerror = () => { delete loaded[src]; rej(new Error('No se pudo cargar ' + src)); };
+        document.head.appendChild(s);
+      });
+    }
+    return loaded[src];
   }
-  function internetAvailable() {
+
+  class MqttTransport extends Emitter {
+    constructor(role, cfg) {
+      super();
+      this.kind = 'mqtt';
+      this.role = role;
+      this.cfg = cfg;
+      this.me = RP.randomId(8);
+      this.peers = new Map();
+      this.closed = false;
+    }
+    async _open(code) {
+      this.emit('status', 'conectando');
+      await loadScript(this.cfg.mqttLibraryPath || 'vendor/mqtt/mqtt.min.js', 'mqtt');
+      const room = await window.SecureChannel.deriveRoom(code);
+      this.key = room.key;
+      this.topic = room.topic;
+      const brokers = this.cfg.mqttBrokers && this.cfg.mqttBrokers.length ? this.cfg.mqttBrokers : ['wss://broker.hivemq.com:8884/mqtt'];
+      let lastErr = null;
+      for (const url of brokers) {
+        try { await this._connect(url); this.broker = url; return; } catch (e) { lastErr = e; console.warn('Broker no disponible:', url, e.message); }
+      }
+      this.emit('status', 'error', 'No se pudo conectar con ningún servidor de mensajería.');
+      throw new Error('Sin conexión con el servidor de mensajería. ' + (lastErr ? lastErr.message : ''));
+    }
+    _connect(url) {
+      return new Promise((resolve, reject) => {
+        const client = window.mqtt.connect(url, {
+          clientId: 'idea_' + RP.randomId(6), clean: true, keepalive: 30,
+          connectTimeout: 8000, reconnectPeriod: 2000, protocolVersion: 4,
+        });
+        let first = true;
+        const fail = setTimeout(() => { if (first) { client.end(true); reject(new Error('tiempo de espera agotado')); } }, 9000);
+        client.on('connect', () => {
+          client.subscribe(this.topic, { qos: 0 }, (err) => {
+            if (err) { if (first) { clearTimeout(fail); client.end(true); reject(err); } return; }
+            this.emit('status', 'conectado');
+            this._ping();
+            if (!first) this.emit('reconnected');
+            if (first) { first = false; clearTimeout(fail); resolve(); }
+          });
+        });
+        client.on('reconnect', () => { if (!first && !this.closed) this.emit('status', 'reconectando'); });
+        client.on('offline', () => { if (!first && !this.closed) this.emit('status', 'reconectando'); });
+        client.on('error', (e) => { if (first) { clearTimeout(fail); client.end(true); reject(e); } });
+        client.on('message', (_t, buf) => this._onMessage(buf));
+        this.client = client;
+      }).then(() => {
+        this.pingTimer = setInterval(() => { this._ping(); this._presence(); }, 4000);
+      });
+    }
+    async _onMessage(buf) {
+      const env = await window.SecureChannel.open(this.key, typeof buf === 'string' ? buf : new TextDecoder().decode(buf));
+      if (!env || typeof env !== 'object' || env.from === this.me || typeof env.ev !== 'string') return;
+      if (env.ev === '_ping') { this.peers.set(env.from, { role: env.role, t: Date.now() }); this._presence(); return; }
+      if (env.ev === '_bye') { this.peers.delete(env.from); this._presence(); return; }
+      this.emit(env.ev, env.payload);
+    }
+    _presence() {
+      const now = Date.now();
+      for (const [k, v] of this.peers) if (now - v.t > 12000) this.peers.delete(k);
+      this.emit('presence', [...this.peers.values()].filter((p) => p.role === 'remote').length);
+    }
+    async _publish(env) {
+      if (!this.client || !this.client.connected) return;
+      this.client.publish(this.topic, await window.SecureChannel.seal(this.key, env), { qos: 0 });
+    }
+    _ping() { this._publish({ ev: '_ping', from: this.me, role: this.role }); }
+    async host() {
+      const code = RP.randomCode();
+      await this._open(code);
+      return { code, expiresAt: null };
+    }
+    async join(code) {
+      if (!RP.isValidCode(code)) throw new Error('Código no válido.');
+      await this._open(code);
+      return { expiresAt: null };
+    }
+    send(ev, payload) { this._publish({ ev, payload, from: this.me, role: this.role }); }
+    onPresence(fn) { this.on('presence', fn); }
+    onStatus(fn) { this.on('status', fn); }
+    async close() {
+      this.closed = true;
+      clearInterval(this.pingTimer);
+      if (this.client) {
+        await this._publish({ ev: '_bye', from: this.me }).catch(() => {});
+        await new Promise((r) => this.client.end(false, {}, r));
+        this.client = null;
+      }
+      this.emit('status', 'desconectado');
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Selección del transporte                                            */
+  /*   'supabase' : si js/remote-config.js tiene URL y clave             */
+  /*   'mqtt'     : internet sin configuración (cifrado de extremo a     */
+  /*                extremo); es el modo por defecto                     */
+  /*   'local'    : ensayo en un solo navegador                          */
+  /* ------------------------------------------------------------------ */
+  const MODE_CODES = { supabase: 'sb', mqtt: 'mq', local: 'local' };
+  function supabaseConfigured() {
     const cfg = window.REMOTE_CONFIG || {};
     return !!(cfg.supabaseUrl && cfg.supabaseAnonKey);
   }
+  function defaultMode() { return supabaseConfigured() ? 'supabase' : 'mqtt'; }
+  function modeFromCode(c) {
+    const m = Object.keys(MODE_CODES).find((k) => MODE_CODES[k] === c);
+    if (m === 'supabase' && !supabaseConfigured()) return 'mqtt';
+    return m || defaultMode();
+  }
+  function createTransport(role, mode) {
+    const cfg = window.REMOTE_CONFIG || {};
+    const m = mode || defaultMode();
+    if (m === 'local') return new LocalTransport(role);
+    if (m === 'supabase' && supabaseConfigured()) return new SupabaseTransport(role, cfg);
+    return new MqttTransport(role, cfg);
+  }
+  // Compatibilidad: «hay internet» = cualquier modo que no sea el de ensayo
+  function internetAvailable() { return true; }
 
-  window.RemoteTransport = { createTransport, internetAvailable, LocalTransport, SupabaseTransport };
+  window.RemoteTransport = {
+    createTransport, internetAvailable, supabaseConfigured, defaultMode, modeFromCode, MODE_CODES,
+    LocalTransport, SupabaseTransport, MqttTransport,
+  };
 })();

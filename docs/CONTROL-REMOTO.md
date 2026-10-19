@@ -5,7 +5,30 @@ Permite que los compañeros manejen la presentación desde su celular o computad
 - **Presentación:** <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/>
 - **Control remoto:** <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/remote.html> (se abre normalmente con el QR o el enlace de la sala)
 
-## Arquitectura
+**Funciona por internet sin configurar nada:** botón **Control remoto** (tecla `R`) → **«Iniciar sesión de presentación»** → los compañeros escanean el QR o escriben el código.
+
+## Tres modos de conexión
+
+| Modo | Cuándo se usa | Requisitos | Control de acceso |
+|---|---|---|---|
+| **Internet · canal cifrado** (por defecto) | Siempre que no haya Supabase configurado | Ninguno | El **código** de la sala es la clave: todo viaja cifrado de extremo a extremo |
+| **Internet · Supabase Realtime** (opcional) | Si `js/remote-config.js` tiene URL y clave | Proyecto de Supabase (unos 10 min) | Además, el servidor exige el código, limita intentos y cierra la sala (RLS) |
+| **Modo ensayo** | Casilla «Modo ensayo» en el panel | Ninguno, sin internet | Solo pestañas del mismo navegador |
+
+### Modo por defecto: MQTT público con cifrado de extremo a extremo
+
+```
+ Celular / PC                 broker MQTT público (wss)                PC de la presentadora
+ remote.html  ── AES-GCM ──►  tema idea-remote/v1/<hash>  ── AES-GCM ──►  index.html
+              ◄─────────────  (solo ve bytes cifrados)    ◄─────────────
+```
+
+- Los mensajes viajan por WebSocket seguro (`wss://`) a un servidor MQTT público: HiveMQ y, si no responde, EMQX. Funciona con datos móviles, con cualquier Wi-Fi y detrás de redes corporativas que permitan HTTPS.
+- **El servidor no puede leer ni falsificar nada.** Del código de la sala se derivan con PBKDF2-SHA256 (300 000 iteraciones) una clave AES-GCM de 256 bits y el nombre del tema. Cada mensaje se cifra y autentica con esa clave (`js/remote/securechannel.js`). Un mensaje alterado, falso o cifrado con otra clave se descarta.
+- El nombre del tema no revela el código. Las 300 000 iteraciones hacen impracticable probar códigos por fuerza bruta durante una exposición.
+- No requiere cuentas, claves ni configuración. La dependencia es un servicio público y gratuito sin garantía de disponibilidad: si ninguno responde, el panel lo indica. Para ese caso existen el modo Supabase y el control local con teclado.
+
+### Modo Supabase (opcional)
 
 ```
  Celular / PC (remote.html)          Supabase Realtime               PC de la presentadora (index.html)
@@ -15,7 +38,7 @@ Permite que los compañeros manejen la presentación desde su celular o computad
   pantalla del remoto ◄──── state ───────  RLS: ¿es presentador? ◄────  publica estado (versión + 1)
 ```
 
-- **Por qué Supabase Realtime:** funciona desde un sitio estático (GitHub Pages) solo con la clave pública *anon*, sin servidor propio. Ofrece *Broadcast* (mensajes de baja latencia), *Presence* (cuántos dispositivos hay) y **canales privados autorizados con políticas RLS**, que permiten restringir de verdad quién lee y escribe en cada sala. Firebase Realtime Database también serviría, pero obligaría a modelar los comandos como escrituras en una base de datos y sus reglas no son SQL versionable junto al código.
+- **Por qué Supabase como opción reforzada:** funciona desde un sitio estático (GitHub Pages) solo con la clave pública *anon*, sin servidor propio. Ofrece *Broadcast* (mensajes de baja latencia), *Presence* (cuántos dispositivos hay) y **canales privados autorizados con políticas RLS**, que permiten restringir de verdad quién lee y escribe en cada sala. Firebase Realtime Database también serviría, pero obligaría a modelar los comandos como escrituras en una base de datos y sus reglas no son SQL versionable junto al código.
 - **Una sola fuente de verdad:** la computadora de la presentadora. Los remotos solo envían *comandos*. La presentadora los valida, los aplica y publica el *estado* con una versión creciente. Los remotos nunca publican estado, así que no hay bucles de eco.
 - **El motor de diapositivas no cambia:** el control remoto usa la API existente (`DECK.go`, `DECK.controller`) y un evento nuevo, `deck:change`. Las diapositivas, animaciones y demostraciones son las mismas. Teclado, ratón y botones locales siguen funcionando igual.
 
@@ -43,7 +66,9 @@ Reglas de la presentadora (`RemoteHost`):
 
 **Pasos de las demostraciones:** son opcionales. La presentadora los activa en el panel («Permitir pasos de las demostraciones»). Entonces, en las diapositivas con demo, el remoto muestra «⟲ · ◀ Paso · Paso ▶ · Toda la ronda ⏩» (⟲ y ⏩ se activan solo si la demo los admite). Esos botones ejecutan los mismos `next/prev` que las teclas `.` y `,` y **nunca cambian de diapositiva**.
 
-## Configurar Supabase (una vez, unos 10 minutos)
+## Configurar Supabase (opcional, una vez, unos 10 minutos)
+
+No es necesario para usar el control remoto: solo añade control de acceso en el servidor.
 
 1. Crea una cuenta y un proyecto gratuito en <https://supabase.com>. Esto lo debe hacer la dueña del proyecto; no se puede automatizar desde aquí.
 2. **Authentication → Sign In / Providers →** activa **«Allow anonymous sign-ins»**. Cada dispositivo obtiene una identidad anónima, sin cuentas ni contraseñas.
@@ -63,7 +88,7 @@ Reglas de la presentadora (`RemoteHost`):
 
 7. Sube el cambio a `main` (GitHub Pages lo publica solo).
 
-**Variables necesarias:** solo esas dos, y ambas son públicas por diseño. **Nunca** pongas la clave `service_role` ni ninguna otra secreta en el código. Si `js/remote-config.js` queda vacío, el control remoto funciona en **modo ensayo**: solo entre pestañas del mismo navegador, útil para practicar.
+**Variables necesarias:** solo esas dos, y ambas son públicas por diseño. **Nunca** pongas la clave `service_role` ni ninguna otra secreta en el código. Si `js/remote-config.js` queda vacío, el control remoto usa el modo por defecto (internet con canal cifrado).
 
 ## Usarlo durante la exposición
 

@@ -8,4 +8,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: node --test tests/idea.test.js tests/content.test.js tests/remote.test.js
+      - run: node --test tests/idea.test.js tests/content.test.js tests/remote.test.js tests/securechannel.test.js

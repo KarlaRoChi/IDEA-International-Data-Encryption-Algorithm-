@@ -56,17 +56,24 @@
     </div>`;
   document.body.appendChild(panel);
 
-  function modeLabel() {
-    return RT.internetAvailable()
-      ? '<span class="rp-mode net">Internet · Supabase Realtime</span>'
-      : '<span class="rp-mode local">Modo ensayo · solo este navegador</span>';
-  }
+  let chosenMode = RT.defaultMode();
+  const MODE_LABEL = {
+    supabase: '<span class="rp-mode net">Internet · Supabase Realtime</span>',
+    mqtt: '<span class="rp-mode net">Internet · canal cifrado de extremo a extremo</span>',
+    local: '<span class="rp-mode local">Modo ensayo · solo este navegador</span>',
+  };
+  function modeLabel() { return MODE_LABEL[session ? session.mode : chosenMode]; }
 
   function renderIdle(error) {
     $('.rp-body', panel).innerHTML = `
       <p class="rp-lead">Tus compañeros podrán cambiar de diapositiva desde su celular o computadora mientras compartes esta pantalla.</p>
       <div class="rp-row">${modeLabel()}</div>
-      ${RT.internetAvailable() ? '' : `<p class="rp-note">No hay un servicio en línea configurado (<code>js/remote-config.js</code>). En este modo el control solo funciona en otras pestañas de este mismo navegador; sirve para ensayar. Para usarlo desde otros dispositivos, sigue <code>docs/CONTROL-REMOTO.md</code>.</p>`}
+      <p class="rp-note">${chosenMode === 'local'
+        ? 'Solo funciona en otras pestañas de este navegador. Sirve para ensayar sin internet.'
+        : chosenMode === 'mqtt'
+          ? 'Funciona desde cualquier red (datos móviles o Wi-Fi). Los mensajes viajan cifrados con una clave que solo conocen quienes tienen el código.'
+          : 'Usa el proyecto de Supabase configurado, con control de acceso en el servidor.'}</p>
+      <label class="rp-check"><input type="checkbox" id="rp-local" ${chosenMode === 'local' ? 'checked' : ''}> Modo ensayo (sin internet, solo este navegador)</label>
       <label class="rp-check"><input type="checkbox" id="rp-demo"> Permitir que los controles avancen los pasos de las demostraciones</label>
       ${error ? `<p class="rp-error">${error}</p>` : ''}
       <button class="btn primary rp-start" data-a="start">Iniciar sesión de presentación</button>`;
@@ -147,7 +154,7 @@
     $('.rp-start', panel).disabled = true;
     $('.rp-start', panel).textContent = 'Creando sala…';
     try {
-      transport = RT.createTransport('presenter');
+      transport = RT.createTransport('presenter', chosenMode);
       transport.onStatus((s, detail) => { status = s; updateBadge(); if (s === 'error' && detail) console.warn('Control remoto:', detail); });
       transport.onPresence((n) => { remotes = n; updateBadge(); });
       transport.on('hello', () => publish(true));
@@ -156,7 +163,7 @@
       host = new RP.RemoteHost({ total: DECK.slides.length, index: DECK.current, allowDemo });
       const r = await transport.host({ ttlMinutes: cfg.roomMinutes || 180 });
       const base = new URL('remote.html', location.href);
-      base.hash = `c=${r.code}${transport.kind === 'local' ? '&m=local' : ''}`;
+      base.hash = `c=${r.code}&m=${RT.MODE_CODES[transport.kind]}`;
       session = { code: r.code, url: base.href, expiresAt: r.expiresAt, mode: transport.kind };
       heartbeat = setInterval(() => publish(true), 10000);
       publish(true);
@@ -213,7 +220,15 @@
       catch (err) { $('.rp-link input', panel).select(); }
     }
   });
-  panel.addEventListener('change', (e) => { if (e.target.id === 'rp-demo' && host) { host.allowDemo = e.target.checked; host.touch(); publish(false); } });
+  panel.addEventListener('change', (e) => {
+    if (e.target.id === 'rp-demo' && host) { host.allowDemo = e.target.checked; host.touch(); publish(false); }
+    if (e.target.id === 'rp-local' && !session) {
+      chosenMode = e.target.checked ? 'local' : RT.defaultMode();
+      const demo = !!($('#rp-demo', panel) || {}).checked;
+      renderIdle();
+      $('#rp-demo', panel).checked = demo;
+    }
+  });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !panel.hidden) { panel.hidden = true; return; }
     const t = e.target;

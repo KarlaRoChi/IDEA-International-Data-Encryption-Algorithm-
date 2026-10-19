@@ -21,8 +21,8 @@
   let lastStateAt = 0;
 
   const params = new URLSearchParams(location.hash.slice(1));
-  const mode = params.get('m') === 'local' ? 'local' : 'auto';
-  $('mode-hint').textContent = (mode === 'local' || !RT.internetAvailable())
+  const mode = RT.modeFromCode(params.get('m'));
+  $('mode-hint').textContent = mode === 'local'
     ? 'Modo ensayo: solo funciona en otra pestaña del mismo navegador que la presentación.'
     : '';
 
@@ -47,7 +47,7 @@
       currentCode = code;
       lastStateAt = Date.now();
       sessionStorage.setItem('idea-remote-code', code);
-      history.replaceState(null, '', location.pathname + location.search + `#c=${code}${mode === 'local' ? '&m=local' : ''}`);
+      history.replaceState(null, '', location.pathname + location.search + `#c=${code}&m=${RT.MODE_CODES[mode]}`);
       show('main');
       hello();
     } catch (err) {
