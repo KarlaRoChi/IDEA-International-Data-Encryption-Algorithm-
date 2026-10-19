@@ -68,3 +68,42 @@ Servidas desde una **subruta** (`http://localhost:8765/IDEA-International-Data-E
 - En una de las capturas automáticas a 1920×1080, el servidor de pruebas local (`python -m http.server`) no entregó un archivo y faltó un bloque. No se reprodujo en 8 cargas posteriores. Por si ocurre el día de la exposición, la presentación muestra un aviso visible cuando falta algún bloque.
 - No hay un vector oficial del NESSIE en las pruebas: el servidor de KU Leuven no respondió. La validación se apoya en el vector de Lai y en OpenSSL, dos fuentes independientes entre sí.
 - Algunos datos se tomaron de fuentes secundarias fiables (Wikipedia, resúmenes de artículos) cuando el texto completo no estaba accesible: las fechas de expiración de las patentes y la clase de 2⁵¹ claves débiles (confirmada por los autores de 2002 que la citan). Están marcados en `js/data/references.js` (campo `note`).
+
+## 5. Control remoto
+
+### Pruebas automáticas
+
+- `tests/remote.test.js` (incluidas en `npm test`): **13 de 13 superadas.** Cubren las acciones de cada comando, comandos inválidos, saltos fuera de rango, duplicados, ráfagas, pulsaciones simultáneas, órdenes absolutas, permisos de las demos, sesión cerrada, estados fuera de orden, reconexión y códigos de sala.
+- `tools/test-supabase-sql.mjs`: **27 de 27 superadas** ejecutando `supabase/setup.sql` en PostgreSQL real (PGlite 0.2.17), con una simulación mínima de `auth.uid()`, `realtime.messages` y `realtime.topic()`.
+
+### Casos pedidos
+
+Los casos marcados «ensayo» se probaron en el navegador con el transporte local: presentación y remotos en pestañas distintas del mismo navegador. El protocolo, la validación y la interfaz son los mismos que por internet; solo cambia el canal.
+
+| # | Caso | Estado |
+|---|---|---|
+| 1 | La presentación funciona sin activar el control remoto | ✔ 29 diapositivas, 0 errores de consola al recorrerlas y avanzar sus demos |
+| 2 | El presentador crea una sala y obtiene un enlace válido | ✔ ensayo: código, enlace, QR y estado «conectado» |
+| 3 | Un celular entra mediante el enlace o el código QR | ✔ ensayo: con el enlace y escribiendo el código (en minúsculas). Diseño verificado a 375×812. ⏳ **Pendiente con un celular real** (necesita Supabase configurado) |
+| 4 | «Siguiente» en el remoto cambia la diapositiva del presentador | ✔ ensayo, con un clic real en el botón |
+| 5 | «Anterior» produce el resultado esperado | ✔ prueba unitaria y ensayo |
+| 6 | Los cambios locales del presentador se reflejan en los remotos | ✔ ensayo |
+| 7 | Un segundo dispositivo también puede enviar comandos | ✔ ensayo: dos remotos, contador «2», «ir a la diapositiva 11» desde el segundo |
+| 8 | Una reconexión recupera el estado actual | ✔ ensayo: al recargar el remoto se reconecta y recibe la diapositiva actual; un estado antiguo no la hace retroceder (unitaria) |
+| 9 | Los comandos inválidos se rechazan | ✔ ensayo (inyectados en el canal: diapositiva 999, comando desconocido, basura, duplicado, ráfaga de 15) y unitaria |
+| 10 | Las animaciones y demostraciones siguen funcionando | ✔ controles locales sin cambios; «Paso ▶» remoto avanzó la demo de 1 a 4 sin cambiar de diapositiva |
+| 11 | Despliegue correcto en GitHub Pages | ✔ `index.html` y `remote.html` publicados (ver el commit) |
+| 12 | Credenciales y reglas de autorización | ✔ sin secretos en el repositorio; reglas probadas en PostgreSQL real. ⏳ **Pendiente contra un proyecto Supabase real** |
+
+Además: con dos «Siguiente» simultáneos solo se avanza una diapositiva (ensayo y unitaria). Tras «Cerrar sesión», los remotos muestran «Sesión terminada» y un comando posterior se ignora.
+
+### Pendiente (requiere el proyecto de Supabase)
+
+Después de configurar `js/remote-config.js`:
+
+1. Abre la presentación publicada y pulsa **Control remoto → Iniciar sesión**. El panel debe decir «Internet · Supabase Realtime» y «conectado».
+2. Escanea el QR con un celular **con datos móviles** (otra red) y pulsa «Siguiente»: la presentación debe avanzar.
+3. Entra desde otra computadora escribiendo el código. El contador debe marcar 2.
+4. Activa y desactiva el modo avión del celular: al volver debe mostrar la diapositiva actual.
+5. Abre `remote.html` en una ventana privada y escribe un código inventado 9 veces. Debe aparecer «Demasiados intentos».
+6. Pulsa «Cerrar sesión». Los celulares deben mostrar «Sesión terminada» y no poder enviar más comandos.

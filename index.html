@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="css/deck.css">
   <link rel="stylesheet" href="css/widgets.css">
   <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/remote.css">
 </head>
 <body>
   <div id="app" class="app">
@@ -103,6 +104,7 @@
               <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
               <dt><kbd>N</kbd> / <kbd>P</kbd></dt><dd>Notas / vista del presentador</dd>
               <dt><kbd>T</kbd></dt><dd>Iniciar o pausar el cronómetro</dd>
+              <dt><kbd>R</kbd></dt><dd>Control remoto (sesión para los compañeros)</dd>
             </dl>
           </section>
           <section>
@@ -151,5 +153,12 @@
 
   <!-- Motor de la presentación -->
   <script src="js/deck/deck.js"></script>
+
+  <!-- Control remoto (opcional; la presentación funciona igual sin él) -->
+  <script src="js/remote-config.js"></script>
+  <script src="vendor/qrcode/qrcode.js"></script>
+  <script src="js/remote/protocol.js"></script>
+  <script src="js/remote/transport.js"></script>
+  <script src="js/remote/presenter.js"></script>
 </body>
 </html>

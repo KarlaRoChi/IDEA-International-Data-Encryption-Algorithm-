@@ -20,6 +20,10 @@ Presentación web interactiva, en formato de diapositivas 16:9, sobre el cifrado
 
 Para no repetir contenido, el bloque 2 usa su propio ejemplo (texto «IDEA1991», clave «XuejiaLai&Massey») y explica la **estructura**. El bloque 3 hace el **cálculo numérico completo** con el vector publicado y explica el **descifrado**.
 
+## Control remoto colaborativo
+
+Los compañeros pueden pasar las diapositivas desde su celular o computadora mientras la presentadora comparte pantalla: botón **Control remoto** (tecla `R`) → **«Iniciar sesión de presentación»** → QR, enlace o código de 8 caracteres. Funciona por internet con **Supabase Realtime** (configuración única, sin servidor propio). Sin configurar, queda en *modo ensayo* (pestañas del mismo navegador). Arquitectura, configuración, seguridad y pruebas: [docs/CONTROL-REMOTO.md](docs/CONTROL-REMOTO.md).
+
 ## Ejecutar en local
 
 No hay que instalar nada. Hay dos opciones:
@@ -94,6 +98,10 @@ js/config.js               Título y bloques (editable)
 js/idea/idea.js            Implementación de IDEA con traza (navegador y Node)
 js/data/references.js      Bibliografía verificable (citada por número en cada diapositiva)
 js/deck/deck.js            Motor: navegación, escalado, índice, notas, presentador, cronómetro
+js/remote/*.js             Control remoto: protocolo, transportes, modo presentador y app del remoto
+js/remote-config.js        Configuración PÚBLICA de Supabase (vacía = modo ensayo)
+remote.html                Interfaz del control remoto (celular o computadora)
+supabase/setup.sql         Tablas, funciones y políticas RLS del control remoto
 js/widgets/*.js            Componentes interactivos (uno o dos por archivo)
 js/slides/0X-*.js          Contenido y notas: un archivo por bloque
 tests/                     Pruebas del algoritmo y del contenido + vectores OpenSSL
@@ -101,6 +109,7 @@ tools/                     Generación de vectores y exportación del guion
 docs/GUION.md              Guion y tiempos (generado)
 docs/PRUEBAS.md            Pruebas realizadas y resultados
 vendor/katex/              KaTeX 0.16.11 (licencia MIT), incluido para uso sin conexión
+vendor/supabase/, qrcode/  supabase-js 2.49.4 y qrcode-generator 1.4.4 (MIT)
 ```
 
 ## Nota sobre la implementación

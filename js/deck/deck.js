@@ -151,6 +151,9 @@
     current = i;
     if (!opts.noHash) history.replaceState(null, '', `#${i + 1}`);
     updateChrome();
+    // Aviso para otros módulos (p. ej., el control remoto). Se emite tanto en
+    // cambios locales como remotos; el control remoto nunca reenvía comandos.
+    window.dispatchEvent(new CustomEvent('deck:change', { detail: { index: i, source: opts.source || 'local' } }));
   }
   /* ------------------------------------------------------------------ */
   /* Animaciones de entrada (escalonadas) y contadores                   */
@@ -498,5 +501,5 @@
   go(Number.isNaN(start) ? 0 : start - 1, { force: true });
 
   // API mínima para depuración y pruebas automáticas
-  window.DECK = { go, next, prev, goSection, get current() { return current; }, slides, blockMinutes, get controller() { return controller; } };
+  window.DECK = { go, next, prev, goSection, config: cfg, get current() { return current; }, slides, blockMinutes, get controller() { return controller; } };
 })();
