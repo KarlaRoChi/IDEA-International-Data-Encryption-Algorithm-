@@ -1,21 +1,24 @@
 # IDEA · International Data Encryption Algorithm
 
-Presentación web interactiva, en formato de diapositivas 16:9, sobre el cifrador por bloques **IDEA** (Xuejia Lai y James L. Massey, ETH Zúrich, 1990–1992). Está pensada para una exposición universitaria de 30–40 minutos dividida entre **cuatro expositores**.
+**▶ Ver la presentación: <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/>**
+· Guion y tiempos: <https://karlarochi.github.io/IDEA-International-Data-Encryption-Algorithm-/guion.html>
 
-- **37 diapositivas · 33,5 min previstos** (≈ 8 min por persona). Ver el [mapa y el guion](docs/GUION.md).
+Presentación web interactiva, en formato de diapositivas 16:9, sobre el cifrador por bloques **IDEA** (Xuejia Lai y James L. Massey, ETH Zúrich, 1990–1992). Está pensada para una exposición universitaria de 30–40 minutos dividida en **cuatro bloques**.
+
+- **37 diapositivas · 33,5 min previstos** (≈ 8 min por bloque). Ver el [mapa y el guion](docs/GUION.md).
 - Implementación **real** de IDEA (bloque de 64 bits, clave de 128 bits, 8,5 rondas), validada con el vector de prueba publicado por Lai (1992) y con **100 vectores independientes generados con OpenSSL**.
 - Sitio **100 % estático**: HTML, CSS y JavaScript sin compilación, sin servidor propio y sin claves privadas. Funciona en GitHub Pages bajo la ruta del proyecto e incluso abriendo `index.html` con doble clic.
 
 ## Reparto (orden fijo)
 
-| Bloque | Expositor | Contenido | Interacciones |
-|---|---|---|---|
-| 1 · Contexto y fundamentos | Persona 1 | Qué es IDEA, historia (PES → IPES → IDEA), limitaciones de DES, PGP, los tres grupos algebraicos y el tratamiento del 0 | Línea de tiempo, laboratorio de ⊕ ⊞ ⊙ sobre bits, comprobador de leyes algebraicas |
-| 2 · Arquitectura y cifrado | Persona 2 | 64/128 bits, división en X1…X4, 52 subclaves y rotación de 25 bits, organización de la ronda, caja MA, 8 + ½ rondas | División del bloque, planificación de claves animada, diagrama de ronda, **visualizador de cifrado ronda a ronda**, difusión de un bit |
-| 3 · Ejemplo práctico y descifrado | Persona 3 | Vector de Lai paso a paso, rondas 2–8, transformación final, descifrado, subclaves inversas y reordenadas | Ronda 1 operación a operación, resumen de rondas, tabla de subclaves de descifrado, **laboratorio de cifrado y descifrado** |
-| 4 · Criptoanálisis y seguridad | Persona 4 | Espacio de claves, seguridad teórica vs práctica, claves débiles, ataques publicados, ventajas y desventajas, patentes, transición a AES, relevancia actual | Calculadora del espacio de claves, capas de seguridad, detector de subclaves triviales, gráfico de ataques (rondas y coste), bits de clave por ronda, comparación DES/IDEA/AES |
+| Bloque | Contenido | Interacciones |
+|---|---|---|
+| 1 · Contexto y fundamentos | Qué es IDEA, historia (PES → IPES → IDEA), limitaciones de DES, PGP, los tres grupos algebraicos y el tratamiento del 0 | Línea de tiempo, laboratorio de ⊕ ⊞ ⊙ sobre bits, comprobador de leyes algebraicas |
+| 2 · Arquitectura y cifrado | 64/128 bits, división en X1…X4, 52 subclaves y rotación de 25 bits, organización de la ronda, caja MA, 8 + ½ rondas | División del bloque, planificación de claves animada, diagrama de ronda, **visualizador de cifrado ronda a ronda**, difusión de un bit |
+| 3 · Ejemplo práctico y descifrado | Vector de Lai paso a paso, rondas 2–8, transformación final, descifrado, subclaves inversas y reordenadas | Ronda 1 operación a operación, resumen de rondas, tabla de subclaves de descifrado, **laboratorio de cifrado y descifrado** |
+| 4 · Criptoanálisis y seguridad | Espacio de claves, seguridad teórica vs práctica, claves débiles, ataques publicados, ventajas y desventajas, patentes, transición a AES, relevancia actual | Calculadora del espacio de claves, capas de seguridad, detector de subclaves triviales, gráfico de ataques (rondas y coste), bits de clave por ronda, comparación DES/IDEA/AES |
 
-Para no repetir contenido, la Persona 2 usa su propio ejemplo (texto «IDEA1991», clave «XuejiaLai&Massey») y explica la **estructura**. La Persona 3 hace el **cálculo numérico completo** con el vector publicado y explica el **descifrado**.
+Para no repetir contenido, el bloque 2 usa su propio ejemplo (texto «IDEA1991», clave «XuejiaLai&Massey») y explica la **estructura**. El bloque 3 hace el **cálculo numérico completo** con el vector publicado y explica el **descifrado**.
 
 ## Ejecutar en local
 
@@ -68,7 +71,7 @@ Todas las rutas son relativas, así que funciona bajo la subruta del proyecto. E
 |---|---|---|---|
 | `→` `PgDn` / `←` `PgUp` | diapositiva siguiente / anterior | `.` / `,` | paso siguiente / anterior de la demo activa |
 | `Inicio` / `Fin` | primera / última | botones propios | cada demo tiene sus controles |
-| `1`–`4` | saltar al bloque de cada persona | | |
+| `1`–`4` | saltar a cada bloque | | |
 | `M` | índice de diapositivas | | |
 | `F` | pantalla completa (la interfaz se oculta sola) | | |
 | `N` | panel de notas | | |
@@ -77,22 +80,22 @@ Todas las rutas son relativas, así que funciona bajo la subruta del proyecto. E
 
 Las flechas nunca avanzan una demo y los controles de una demo nunca cambian de diapositiva. Mientras se escribe en un campo, el teclado no mueve la presentación. Un mando de presentaciones (que envía `PgDn`/`PgUp`) solo cambia de diapositiva.
 
-Para poner los nombres reales de los expositores, edita `js/config.js`. Las portadas, el pie, el índice y el guion se actualizan solos.
+Los títulos y colores de los bloques están en `js/config.js`; las portadas, el pie, el índice y el guion se actualizan solos.
 
 ## Estructura
 
 ```
 index.html                 Estructura de la aplicación (barra, escenario 16:9, índice, notas)
 guion.html                 Guion imprimible y tiempos, generado de las diapositivas
-css/theme.css              Variables de diseño (colores de operaciones y expositores)
+css/theme.css              Variables de diseño (colores de operaciones y bloques)
 css/deck.css               Sistema de diapositivas y estilos por diapositiva
 css/widgets.css            Componentes interactivos
-js/config.js               Título y expositores (editable)
+js/config.js               Título y bloques (editable)
 js/idea/idea.js            Implementación de IDEA con traza (navegador y Node)
 js/data/references.js      Bibliografía verificable (citada por número en cada diapositiva)
 js/deck/deck.js            Motor: navegación, escalado, índice, notas, presentador, cronómetro
 js/widgets/*.js            Componentes interactivos (uno o dos por archivo)
-js/slides/0X-*.js          Contenido y notas: un archivo por expositor
+js/slides/0X-*.js          Contenido y notas: un archivo por bloque
 tests/                     Pruebas del algoritmo y del contenido + vectores OpenSSL
 tools/                     Generación de vectores y exportación del guion
 docs/GUION.md              Guion y tiempos (generado)

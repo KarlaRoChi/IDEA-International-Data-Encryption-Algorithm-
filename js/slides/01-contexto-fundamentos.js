@@ -1,5 +1,5 @@
 /*
- * BLOQUE 1 — Persona 1: Contexto y fundamentos.
+ * BLOQUE 1: Contexto y fundamentos.
  * Temas exclusivos: introducción, historia (ETH Zúrich, Lai y Massey),
  * limitaciones de DES, adopción en PGP, fundamentos matemáticos y las tres
  * operaciones (⊕, ⊞, ⊙ con el tratamiento del cero), y por qué mezclarlas.
@@ -50,7 +50,7 @@
       notes: String.raw`
         <p class="script">«IDEA es un cifrador simétrico por bloques: emisor y receptor comparten una misma clave secreta, y el algoritmo transforma bloques de tamaño fijo. Lo propusieron Xuejia Lai y James Massey como alternativa a DES.»</p>
         <p class="script">«Lo que lo hace especial no es su tamaño ni su velocidad, sino su principio de diseño. DES usa tablas de sustitución, las cajas S. IDEA, en cambio, consigue la no linealidad mezclando tres operaciones aritméticas que pertenecen a grupos algebraicos distintos. Esa idea guía toda la presentación.»</p>
-        <ul><li>No dar aquí el tamaño de bloque ni de clave: lo presenta la Persona 2.</li>
+        <ul><li>No dar aquí el tamaño de bloque ni de clave: lo presenta el bloque 2.</li>
         <li>Si preguntan por el nombre: IDEA = <i>International Data Encryption Algorithm</i>.</li></ul>`,
     },
 
@@ -64,7 +64,7 @@
       notes: String.raw`
         <p class="script">«IDEA nace en el ETH de Zúrich, en el grupo de James Massey. Su doctorando Xuejia Lai y él presentaron en EUROCRYPT 1990 un primer diseño llamado PES, <i>Proposed Encryption Standard</i>.»</p>
         <p class="script">«Ese mismo año, Biham y Shamir presentaron el criptoanálisis diferencial, una técnica nueva que obligó a revisar muchos diseños. En 1991, Lai, Massey y Murphy estudiaron esa amenaza con la teoría de los cifradores de Markov y reforzaron PES. El resultado se llamó IPES, <i>Improved</i> PES. En 1992 la tesis doctoral de Lai lo presenta ya como IDEA, junto con el vector de prueba que usará mi compañero en el bloque 3.»</p>
-        <ul><li>El diseño se hizo con un contrato de investigación de la Fundación Hasler, luego integrada en Ascom-Tech AG. Las patentes las cuenta la Persona 4.</li>
+        <ul><li>El diseño se hizo con un contrato de investigación de la Fundación Hasler, luego integrada en Ascom-Tech AG. Las patentes las cuenta el bloque 4.</li>
         <li>Recorrer con <b>.</b> (siguiente hito) sin cambiar de diapositiva.</li></ul>`,
     },
 
@@ -95,7 +95,7 @@
         <p class="script">«¿Por qué hacía falta una alternativa? DES, estandarizado en 1977, tenía tres problemas. El primero, una clave efectiva de solo 56 bits. Hoy eso se recorre por fuerza bruta: en 1998 la Electronic Frontier Foundation construyó, por unos 250 000 dólares, una máquina que encontraba una clave en días.»</p>
         <p class="script">«El segundo: DES se diseñó para hardware. Sus permutaciones de bits son muy rápidas en un chip, pero costosas en un programa. El tercero: en 1990 apareció el criptoanálisis diferencial y los diseñadores ya no podían ignorar los ataques estadísticos. Además, los criterios con los que se eligieron las cajas S de DES no se habían publicado.»</p>
         <p class="script">«IDEA se propuso resolver los tres: una clave mucho más larga, operaciones naturales para un procesador de 16 bits y un diseño justificado frente al ataque diferencial.»</p>
-        <ul><li>No dar todavía los 128 bits de IDEA: decir solo «mucho más larga». La cifra la da la Persona 2.</li></ul>`,
+        <ul><li>No dar todavía los 128 bits de IDEA: decir solo «mucho más larga». La cifra la da el bloque 2.</li></ul>`,
     },
 
     /* 1.4 PGP */
@@ -132,7 +132,7 @@
       notes: String.raw`
         <p class="script">«IDEA se hizo famoso gracias a PGP, <i>Pretty Good Privacy</i>, el programa de Phil Zimmermann para cifrar correo. La primera versión, de 1991, usaba un cifrador inventado por el propio Zimmermann, BassOmatic. Eli Biham le mostró que era débil. En PGP 2.0, de 1992, Zimmermann lo cambió por IDEA.»</p>
         <p class="script">«PGP usa un esquema híbrido. Para cada mensaje genera una clave de sesión aleatoria y cifra el texto con IDEA, que es rápido. Después cifra solo esa clave con RSA, usando la clave pública del destinatario. Así IDEA pasó a proteger el correo de usuarios de todo el mundo durante los años noventa.»</p>
-        <ul><li>Las licencias y patentes de IDEA, que influyeron en la evolución de PGP, las trata la Persona 4.</li></ul>`,
+        <ul><li>Las licencias y patentes de IDEA, que influyeron en la evolución de PGP, las trata el bloque 4.</li></ul>`,
     },
 
     /* 1.5 Fundamentos matemáticos */
@@ -163,13 +163,13 @@
         <p class="script">«La primera es el XOR: sumamos bit a bit módulo 2, sin acarreos. La segunda es la suma de enteros módulo 2 a la 16: sumamos normalmente y descartamos el acarreo que se sale de los 16 bits. La tercera es la más original: la multiplicación módulo 2 a la 16 más 1, es decir, módulo 65 537.»</p>
         <p class="script">«¿Por qué 65 537? Porque es primo. Entonces los números del 1 al 65 536 forman un grupo con la multiplicación y todos tienen inverso. Son exactamente 2 a la 16 valores, tantos como palabras de 16 bits. El único problema es que 65 536 no cabe en 16 bits. La solución es reinterpretar la palabra 0000 como 2 a la 16. Este es el “tratamiento especial del cero”.»</p>
         <ul><li>Dato útil: \(2^{16} \equiv -1 \pmod{65537}\), así que multiplicar por la palabra 0 equivale a cambiar de signo.</li>
-        <li>No entrar en cómo se usan los inversos para descifrar: es tema de la Persona 3.</li></ul>`,
+        <li>No entrar en cómo se usan los inversos para descifrar: es tema de el bloque 3.</li></ul>`,
     },
 
     /* 1.6 Laboratorio de operaciones */
     {
       id: 'b1-lab', person: P, title: 'Laboratorio: las tres operaciones', minutes: 1.4,
-      kicker: 'Persona 1 · Interactivo · operaciones reales de IDEA sobre 16 bits',
+      kicker: 'Bloque 1 · Interactivo · operaciones reales de IDEA sobre 16 bits',
       refs: ['lai-1992'],
       html: String.raw`<div class="ops-slot"></div>`,
       mount: (root) => W.OpsLab(root.querySelector('.ops-slot')),

@@ -1,0 +1,102 @@
+/* ===========================================================
+   Animaciones: discretas, con propósito y desactivadas si el
+   sistema pide movimiento reducido (ver theme.css).
+   =========================================================== */
+
+/* ---------- Entrada escalonada de los elementos de una diapositiva ---------- */
+.rv { animation: rv-in .55s var(--ease) both; animation-delay: var(--rvd, 0ms); }
+@keyframes rv-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.rv-left { animation-name: rv-left; }
+@keyframes rv-left { from { opacity: 0; transform: translateX(-22px); } to { opacity: 1; transform: none; } }
+.rv-pop { animation-name: rv-pop; }
+@keyframes rv-pop { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+
+/* ---------- Título de la diapositiva ---------- */
+.slide.entering h1 { animation: rv-in .5s var(--ease) both; animation-delay: 60ms; }
+.slide.entering .kicker { animation: rv-left .45s var(--ease) both; }
+
+/* ---------- Portadas de bloque ---------- */
+.slide.cover::before { transform-origin: top; animation: bar-grow .8s var(--ease) both; }
+@keyframes bar-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.cover .block-num { animation: rv-left .5s var(--ease) both; }
+.cover h1 { animation: rv-in .6s var(--ease) both; animation-delay: 120ms; }
+.cover .duration { animation: rv-in .5s var(--ease) both; animation-delay: 700ms; }
+
+/* ---------- Portada general ---------- */
+.title-mark svg { animation: sym-in .7s var(--ease) both; }
+.title-mark svg:nth-child(2) { animation-delay: .15s; }
+.title-mark svg:nth-child(3) { animation-delay: .3s; }
+@keyframes sym-in { from { opacity: 0; transform: rotate(-120deg) scale(.4); } to { opacity: 1; transform: none; } }
+.title-main { background: linear-gradient(90deg, #fff 0%, #fff 40%, var(--mul) 50%, #fff 60%, #fff 100%); background-size: 300% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 6s ease-in-out 1s infinite, rv-in .7s var(--ease) both; }
+@keyframes shine { 0%, 60% { background-position: 100% 0; } 100% { background-position: -50% 0; } }
+.hex-rain { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; -webkit-mask-image: linear-gradient(90deg, transparent 50%, #000 85%); mask-image: linear-gradient(90deg, transparent 50%, #000 85%); }
+.hex-rain span { position: absolute; top: -40%; font-family: var(--mono); font-size: 18px; line-height: 1.6; color: var(--line); white-space: pre; writing-mode: vertical-rl; animation: rain linear infinite; opacity: .35; }
+.hex-rain span:nth-child(3n) { color: rgba(192, 132, 252, .35); }
+.hex-rain span:nth-child(4n) { color: rgba(34, 211, 238, .3); }
+@keyframes rain { from { transform: translateY(0); } to { transform: translateY(160%); } }
+.title-wrap { position: relative; z-index: 1; }
+
+/* ---------- Transición entre bloques ---------- */
+.handoff .next { animation: rv-in-right .6s var(--ease) both; animation-delay: 350ms; }
+@keyframes rv-in-right { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
+.handoff .next .label::after { content: '→'; display: inline-block; margin-left: 8px; animation: nudge 1.4s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+
+/* ---------- Resaltado de lo que acaba de cambiar en una demo ---------- */
+.rviz-formula > *, .walk-cur > *, .tl-detail > *, .layers-detail > *, .att-detail, .weak-meter .big-number,
+.kbu-info .big-number, .verdict, .lab-keys .lkey.on, .kchip.on, .ops-row .res-hex, .phase.on {
+  animation: flash-in .45s var(--ease) both;
+}
+@keyframes flash-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ops-table tr.cur td, .walk-list li.cur, .states .st.cur, .rsum-table tr.cur td, .rsum-table tr.cur th, .fop.shown {
+  animation: row-flash .7s ease-out both;
+}
+@keyframes row-flash { from { background-color: rgba(255, 255, 255, .16); } }
+.verdict.ok { animation: flash-in .45s var(--ease) both, glow-ok 1.6s ease-out .2s both; }
+@keyframes glow-ok { from { box-shadow: 0 0 0 0 rgba(74, 222, 128, .55); } to { box-shadow: 0 0 0 18px rgba(74, 222, 128, 0); } }
+.cipher { animation: decode .9s steps(9) both; }
+@keyframes decode { from { letter-spacing: .5em; opacity: .2; filter: blur(3px); } to { letter-spacing: normal; opacity: 1; filter: none; } }
+
+/* ---------- Barras que crecen al aparecer ---------- */
+.att-bar, .ksr-bar, .tr-bar span, .cmpk-bar, .law-stat .bar span, .weak-meter .bar span {
+  transform-origin: left center; animation: grow-x .8s var(--ease) both;
+}
+@keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.att-row:nth-child(2) .att-bar { animation-delay: 40ms; } .att-row:nth-child(3) .att-bar { animation-delay: 80ms; }
+.att-row:nth-child(4) .att-bar { animation-delay: 120ms; } .att-row:nth-child(5) .att-bar { animation-delay: 160ms; }
+.att-row:nth-child(6) .att-bar { animation-delay: 200ms; } .att-row:nth-child(7) .att-bar { animation-delay: 240ms; }
+.att-row:nth-child(8) .att-bar { animation-delay: 280ms; } .att-row:nth-child(9) .att-bar { animation-delay: 320ms; }
+
+/* ---------- Diagrama de ronda ---------- */
+.round-svg .wire { stroke-dasharray: 900; stroke-dashoffset: 900; animation: draw 1.1s ease-out forwards; }
+.round-svg .key-wire, .round-svg .nocross { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.round-svg .node { animation: node-in .4s var(--ease) backwards; transform-box: fill-box; transform-origin: center; }
+.round-svg .node[data-zone="ma-in"] { animation-delay: .25s; }
+.round-svg .node[data-zone="ma"] { animation-delay: .45s; }
+.round-svg .node[data-zone="out"] { animation-delay: .65s; }
+@keyframes node-in { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+.round-svg .node.hl .node-shape { animation: pulse 1.3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes pulse { 0%, 100% { filter: drop-shadow(0 0 4px rgba(255,255,255,.25)); } 50% { filter: drop-shadow(0 0 14px rgba(255,255,255,.6)); } }
+.round-svg .node.hl .val { animation: val-pop .45s var(--ease) both; transform-box: fill-box; transform-origin: center; }
+@keyframes val-pop { from { opacity: 0; transform: translateY(6px) scale(.85); } to { opacity: 1; transform: none; } }
+.round-svg .ma-box { animation: rv-pop .6s var(--ease) .35s both; transform-box: fill-box; transform-origin: center; }
+
+/* ---------- Línea de tiempo ---------- */
+.tl-ev.active .tl-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+@keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--pc) 25%, transparent); } 50% { box-shadow: 0 0 0 11px color-mix(in srgb, var(--pc) 8%, transparent); } }
+
+/* ---------- Bits ---------- */
+.bit { transition: background .25s, color .25s, transform .15s; }
+.bits.clickable .bit:active { transform: scale(.85); }
+.ops-row .bits .bit { animation: bit-in .35s var(--ease) both; }
+.ops-row .bits .bit:nth-child(4n+2) { animation-delay: 30ms; } .ops-row .bits .bit:nth-child(4n+3) { animation-delay: 60ms; } .ops-row .bits .bit:nth-child(4n+4) { animation-delay: 90ms; }
+@keyframes bit-in { from { opacity: .2; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Botones ---------- */
+.btn, .chip, .tab, .rail-btn, .layer { transition: background .15s, border-color .15s, transform .12s, color .15s; }
+.btn:active:not(:disabled), .chip:active, .tab:active, .rail-btn:active { transform: scale(.96); }
+.rail-btn.active { animation: rv-pop .3s var(--ease) both; }
+
+@media print { .rv, .slide * { animation: none !important; opacity: 1 !important; } }

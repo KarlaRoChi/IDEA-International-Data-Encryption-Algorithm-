@@ -1,5 +1,5 @@
 /*
- * BLOQUE 4 — Persona 4: Criptoanálisis y seguridad.
+ * BLOQUE 4: Criptoanálisis y seguridad.
  * Temas exclusivos: espacio de claves, seguridad teórica vs práctica, claves
  * débiles, ataques publicados (rondas reducidas vs IDEA completo), ventajas,
  * desventajas, patentes y licencias, transición a AES y relevancia actual.

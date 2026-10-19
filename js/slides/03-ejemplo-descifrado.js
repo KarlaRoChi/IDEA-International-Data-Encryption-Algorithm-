@@ -1,5 +1,5 @@
 /*
- * BLOQUE 3 — Persona 3: Ejemplo práctico y descifrado.
+ * BLOQUE 3: Ejemplo práctico y descifrado.
  * Ejemplo REAL de IDEA (64/128 bits): el vector de prueba de Lai (1992),
  *   K = 0001 0002 0003 0004 0005 0006 0007 0008
  *   P = 0000 0001 0002 0003  ->  C = 11FB ED2B 0198 6DE5
@@ -59,7 +59,7 @@
     /* 3.2 Ronda 1 paso a paso */
     {
       id: 'b3-ronda1', className: 'dense', person: P, title: 'Ronda 1, operación por operación', minutes: 1.6,
-      kicker: 'Persona 3 · Interactivo · 14 operaciones con valores reales',
+      kicker: 'Bloque 3 · Interactivo · 14 operaciones con valores reales',
       refs: ['lai-1992'],
       html: String.raw`<div class="walk-slot" style="flex:1;min-height:0"></div>`,
       mount: (root) => W.RoundWalkthrough(root.querySelector('.walk-slot')),
@@ -133,7 +133,7 @@
     /* 3.6 Laboratorio */
     {
       id: 'b3-laboratorio', className: 'dense', person: P, title: 'Laboratorio de cifrado y descifrado', minutes: 1.8,
-      kicker: 'Persona 3 · Interactivo · IDEA completo (64/128 bits)',
+      kicker: 'Bloque 3 · Interactivo · IDEA completo (64/128 bits)',
       refs: ['lai-1992'],
       html: String.raw`<div class="lab-slot" style="flex:1;min-height:0"></div>`,
       mount: (root) => W.CryptoLab(root.querySelector('.lab-slot')),

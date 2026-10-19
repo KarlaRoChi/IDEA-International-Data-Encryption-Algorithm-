@@ -37,24 +37,24 @@ let out = `# Guion y distribución de tiempos
 
 > Archivo generado con \`node tools/export-guion.js\` a partir de \`js/slides/*.js\`. No editar a mano.
 
-**${S.length} diapositivas · ${fmt(total)} min previstos** (sin preguntas). Objetivo: 30–40 min, ≈ 8 min por persona.
+**${S.length} diapositivas · ${fmt(total)} min previstos** (sin preguntas). Objetivo: 30–40 min, ≈ 8 min por bloque.
 
-| Bloque | Expositor | Diapositivas | Minutos |
-|---|---|--:|--:|
+| Bloque | Diapositivas | Minutos |
+|---|--:|--:|
 `;
 [{ id: 0, name: '—', block: 'Portada y cierre (compartidas)' }, ...cfg.presenters].forEach((p) => {
-  out += `| ${p.block} | ${p.id ? p.name : '—'} | ${S.filter((s) => (s.person || 0) === p.id).length} | ${fmt(mins(p.id))} |\n`;
+  out += `| ${p.id ? p.name + ' · ' : ''}${p.block} | ${S.filter((s) => (s.person || 0) === p.id).length} | ${fmt(mins(p.id))} |\n`;
 });
-out += `| **Total** | | **${S.length}** | **${fmt(total)}** |\n\n## Mapa de diapositivas\n\n| # | Diapositiva | Responsable | Min | Acumulado | Interactiva |\n|--:|---|---|--:|--:|:-:|\n`;
+out += `| **Total** | **${S.length}** | **${fmt(total)}** |\n\n## Mapa de diapositivas\n\n| # | Diapositiva | Bloque | Min | Acumulado | Interactiva |\n|--:|---|---|--:|--:|:-:|\n`;
 let acc = 0;
 S.forEach((s, i) => {
   acc += s.minutes;
   const p = cfg.presenters.find((x) => x.id === s.person);
-  out += `| ${i + 1} | ${s.title} | ${p ? p.name : 'Compartida'} | ${fmt(s.minutes)} | ${fmt(acc)} | ${s.mount ? '●' : ''} |\n`;
+  out += `| ${i + 1} | ${s.title} | ${p ? p.id : '—'} | ${fmt(s.minutes)} | ${fmt(acc)} | ${s.mount ? '●' : ''} |\n`;
 });
 
 cfg.presenters.forEach((p) => {
-  out += `\n## Bloque ${p.id} · ${p.block} — ${p.name} (${fmt(mins(p.id))} min)\n`;
+  out += `\n## Bloque ${p.id} · ${p.block} (${fmt(mins(p.id))} min)\n`;
   S.forEach((s, i) => {
     if (s.person !== p.id) return;
     const refs = (s.refs || []).map((r) => `[${REFS.byId[r].n}]`).join(' ');

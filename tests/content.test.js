@@ -25,7 +25,7 @@ test('index.html carga los mismos archivos de diapositivas, en el mismo orden', 
   assert.deepEqual(found, order);
 });
 
-test('orden estricto de los expositores: 0, 1…1, 2…2, 3…3, 4…4, 0', () => {
+test('orden estricto de los bloques: 0, 1…1, 2…2, 3…3, 4…4, 0', () => {
   const seq = S.map((s) => s.person || 0).filter((p, i, a) => i === 0 || p !== a[i - 1]);
   assert.deepEqual(Array.from(seq), [0, 1, 2, 3, 4, 0]);
 });

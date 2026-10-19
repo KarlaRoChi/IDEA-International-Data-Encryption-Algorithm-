@@ -1,10 +1,10 @@
 /*
- * BLOQUE 2 — Persona 2: Arquitectura y cifrado.
+ * BLOQUE 2: Arquitectura y cifrado.
  * Temas exclusivos: estructura general, bloque de 64 bits, clave de 128 bits,
  * división en 4 subbloques, 52 subclaves, rotación de 25 bits, 8 rondas + ½,
  * organización de la ronda, caja MA y transformación del bloque.
  * Ejemplo PROPIO de este bloque: texto «IDEA1991» y clave «XuejiaLai&Massey»
- * (distinto del ejemplo numérico de la Persona 3, para no duplicarlo).
+ * (distinto del ejemplo numérico de el bloque 3, para no duplicarlo).
  * NO incluye: el ejemplo académico completo, el descifrado ni la seguridad.
  */
 (function () {
@@ -92,7 +92,7 @@
         <p class="script">«Cada celda conserva el color de su posición original en la clave, así que al pulsar “Rotar 25 bits” se ve el desplazamiento del patrón. Tras 6 rotaciones hay 56 palabras; solo se necesitan 52, así que las 4 últimas se descartan.»</p>
         <p class="script">«En la tabla de la derecha se ve qué subclave corresponde a cada ronda: seis por ronda, en este orden: multiplicación, suma, suma, multiplicación y dos multiplicaciones para la caja MA. La fila de salida solo usa cuatro.»</p>
         <ul><li>La clave de ejemplo es el texto ASCII «XuejiaLai&Massey».</li>
-        <li>Una observación sin desarrollarla: la planificación solo selecciona bits, no los mezcla. Sus consecuencias de seguridad las analiza la Persona 4.</li></ul>`,
+        <li>Una observación sin desarrollarla: la planificación solo selecciona bits, no los mezcla. Sus consecuencias de seguridad las analiza el bloque 4.</li></ul>`,
     },
 
     /* 2.3 Organización de una ronda */
@@ -154,13 +154,13 @@
         <p class="script">«El corazón de cada ronda es la caja MA, de multiplicación-adición. Recibe p y q, los dos XOR de la fase anterior, y las subclaves Z5 y Z6. Calcula s = p ⊙ Z5; t = (q ⊞ s) ⊙ Z6; y u = s ⊞ t.»</p>
         <p class="script">«¿Por qué esta forma? Porque, alternando multiplicaciones y sumas, cada bit de salida depende de todos los bits de entrada y de las dos subclaves. A eso se le llama difusión completa. Según sus autores, es la estructura más pequeña, de solo cuatro operaciones, que la consigue.»</p>
         <p class="script">«Después, t se combina con XOR con las palabras 1 y 3, y u con las palabras 2 y 4. Así el efecto de la caja MA llega a todo el bloque.»</p>
-        <ul><li>No adelantar por qué esta estructura facilita el descifrado: lo explica la Persona 3.</li></ul>`,
+        <ul><li>No adelantar por qué esta estructura facilita el descifrado: lo explica el bloque 3.</li></ul>`,
     },
 
     /* 2.5 Visualizador interactivo */
     {
       id: 'b2-visualizador', className: 'dense', person: P, title: 'Cifrado ronda por ronda', minutes: 1.9,
-      kicker: 'Persona 2 · Interactivo · valores calculados en vivo',
+      kicker: 'Bloque 2 · Interactivo · valores calculados en vivo',
       refs: ['lai-1992'],
       html: String.raw`<div class="viz-slot" style="flex:1;min-height:0"></div>`,
       mount: (root) => W.RoundVisualizer(root.querySelector('.viz-slot'), DEMO),
@@ -170,7 +170,7 @@
         <p class="script">«Con “Ronda ⏭” salto a la octava: no hay cruce. Después, la transformación de salida solo hace cuatro operaciones con Z49 a Z52, sin caja MA. Su resultado es el bloque cifrado.»</p>
         <ul><li>Guion de clics: Paso ▶ ×4 (capa de subclaves) → Ronda ⏭ hasta R8 → Ronda ⏭ (½) → Paso ▶ hasta el final.</li>
         <li>«⟲ Reiniciar» vuelve al principio. «▷ Auto» reproduce sola la animación.</li>
-        <li>El ejemplo numérico «oficial» y su verificación los presenta la Persona 3; aquí no se detallan.</li></ul>`,
+        <li>El ejemplo numérico «oficial» y su verificación los presenta el bloque 3; aquí no se detallan.</li></ul>`,
     },
 
     /* 2.6 Transformación del bloque */

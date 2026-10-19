@@ -22,7 +22,7 @@
   const presenters = cfg.presenters;
   const personOf = (s) => presenters.find((p) => p.id === s.person);
 
-  // Índices por persona para el progreso de cada sección
+  // Índices por bloque para el progreso de cada sección
   const bySection = {};
   slides.forEach((s, i) => {
     s.index = i;
@@ -67,7 +67,7 @@
   function footHtml(s) {
     const p = personOf(s);
     const who = p
-      ? `<div class="who"><span class="badge">${p.id}</span>${p.name} · ${p.block}</div>
+      ? `<div class="who"><span class="badge">${p.id}</span>${p.block}</div>
          <div class="pips">${Array.from({ length: s.sectionSize }, (_, i) => `<i class="${i < s.posInSection ? 'on' : ''}"></i>`).join('')}</div>`
       : `<div class="who">${cfg.title} · ${cfg.subtitle}</div>`;
     return `<footer class="slide-foot">${who}${refsHtml(s)}<span class="num">${s.index + 1}/${slides.length}</span></footer>`;
@@ -78,7 +78,6 @@
     return `
       <div class="block-num">Bloque ${p.id} de ${presenters.length}</div>
       <h1>${p.block}</h1>
-      <div class="presenter">Expone: <strong>${p.name}</strong></div>
       <div class="agenda">${(s.agenda || []).map((a) => `<span>${a}</span>`).join('')}</div>
       <div class="duration">≈ ${blockMinutes(p.id).toFixed(1).replace('.', ',')} min · ${bySection[p.id].length} diapositivas</div>`;
   }
@@ -88,8 +87,7 @@
     const nextBox = next
       ? `<div class="next" style="--nc:${next.color}">
            <div class="label">A continuación · Bloque ${next.id}</div>
-           <div class="name">${next.name}</div>
-           <div>${next.block}</div>
+           <div class="name">${next.block}</div>
            ${s.teaser ? `<p class="small" style="margin-top:16px">${s.teaser}</p>` : ''}
          </div>`
       : `<div class="next" style="--nc:var(--text-2)">
@@ -149,10 +147,49 @@
     if (typeof s.mount === 'function') {
       try { controller = s.mount(el.querySelector('.body') || el) || null; } catch (e) { console.error('Error al montar la demo', e); }
     }
+    if (!reducedMotion) animateIn(el, s);
     current = i;
     if (!opts.noHash) history.replaceState(null, '', `#${i + 1}`);
     updateChrome();
   }
+  /* ------------------------------------------------------------------ */
+  /* Animaciones de entrada (escalonadas) y contadores                   */
+  /* ------------------------------------------------------------------ */
+  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const REVEAL = [
+    '.body > .lead', '.body > p', '.body > .callout', '.body > .formula', '.body > .formula-row',
+    'ul.clean > li', '.grid-2 > *', '.grid-3 > *', '.grid-4 > *', '.phase', '.lane .ev', '.tt',
+    '.agenda span', '.data-box', '.law', '.layer', '.ksr', '.tr-row', '.att-row', '.tl-ev',
+    '.ops-word', '.ops-row', '.lab-main > section', '.rviz-rail .rail-btn', '.lanes > .lane', '.cmp-table tbody tr',
+  ].join(',');
+  function animateIn(el, s) {
+    const items = [...el.querySelectorAll(REVEAL)].filter((x) => !x.closest('.handoff .next'));
+    items.slice(0, 40).forEach((x, k) => {
+      x.classList.add('rv');
+      if (x.matches('ul.clean > li, .phase, .lane .ev, .layer, .tl-ev')) x.classList.add('rv-left');
+      if (x.matches('.tt, .grid-4 > *, .data-box')) x.classList.add('rv-pop');
+      x.style.setProperty('--rvd', `${150 + Math.min(k, 14) * 70}ms`);
+    });
+    el.querySelectorAll('.big-number').forEach(countUp);
+  }
+  /** Cuenta desde 0 hasta el número que muestra el elemento (enteros o «8,5»). */
+  function countUp(elm) {
+    const node = [...elm.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim());
+    if (!node) return;
+    const txt = node.textContent.trim();
+    if (!/^\d+(,\d+)?$/.test(txt)) return;
+    const target = parseFloat(txt.replace(',', '.'));
+    const dec = txt.includes(',') ? 1 : 0;
+    const t0 = performance.now(), dur = 900;
+    const tick = (t) => {
+      const k = Math.min(1, (t - t0) / dur);
+      const v = target * (1 - Math.pow(1 - k, 3));
+      node.textContent = v.toFixed(dec).replace('.', ',');
+      if (k < 1) requestAnimationFrame(tick); else node.textContent = txt;
+    };
+    requestAnimationFrame(tick);
+  }
+
   const next = () => go(current + 1);
   const prev = () => go(current - 1);
 
@@ -227,7 +264,7 @@
       sec.style.setProperty('--c', p.color);
       const mins = list.reduce((a, i) => a + (slides[i].minutes || 0), 0);
       sec.innerHTML = `<header><b>${p.id ? 'Bloque ' + p.id : 'General'}</b><span>${mins.toFixed(1).replace('.', ',')} min</span></header>
-        <div class="block-name">${p.id ? p.name + ' · ' + p.block : p.name}</div>
+        <div class="block-name">${p.id ? p.block : p.name}</div>
         <ol>${list.map((i) => `<li><button data-i="${i}"><span class="n">${i + 1}</span>${slides[i].menuTitle || slides[i].title}<span class="m">${(slides[i].minutes || 0).toFixed(1).replace('.', ',')}′</span></button></li>`).join('')}</ol>`;
       grid.appendChild(sec);
     });

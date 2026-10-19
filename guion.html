@@ -58,22 +58,22 @@
       let html = `<h2 style="--c:#9ca3af">Resumen</h2>
         <p>${S.length} diapositivas · duración prevista <b>${fmt(total)} min</b> (sin preguntas).</p>
         <div class="bar">${groups.map((g) => `<span style="flex:${mins(g.id)};background:${color[g.id]}" title="${g.block}"></span>`).join('')}</div>
-        <table><thead><tr><th>Bloque</th><th>Expositor</th><th class="num">Diapositivas</th><th class="num">Minutos</th></tr></thead><tbody>
-        ${groups.map((g) => `<tr><td>${g.block}</td><td>${g.id ? g.name : '—'}</td><td class="num">${S.filter((s) => (s.person || 0) === g.id).length}</td><td class="num">${fmt(mins(g.id))}</td></tr>`).join('')}
-        <tr><th>Total</th><td></td><td class="num">${S.length}</td><td class="num"><b>${fmt(total)}</b></td></tr></tbody></table>
+        <table><thead><tr><th>Bloque</th><th class="num">Diapositivas</th><th class="num">Minutos</th></tr></thead><tbody>
+        ${groups.map((g) => `<tr><td>${g.id ? g.name + ' · ' : ''}${g.block}</td><td class="num">${S.filter((s) => (s.person || 0) === g.id).length}</td><td class="num">${fmt(mins(g.id))}</td></tr>`).join('')}
+        <tr><th>Total</th><td class="num">${S.length}</td><td class="num"><b>${fmt(total)}</b></td></tr></tbody></table>
         <h3>Tiempo por diapositiva</h3>
-        <table><thead><tr><th>#</th><th>Diapositiva</th><th>Responsable</th><th class="num">Min</th><th class="num">Acumulado</th></tr></thead><tbody>`;
+        <table><thead><tr><th>#</th><th>Diapositiva</th><th>Bloque</th><th class="num">Min</th><th class="num">Acumulado</th></tr></thead><tbody>`;
       let acc = 0;
       S.forEach((s, i) => {
         acc += s.minutes || 0;
         const p = cfg.presenters.find((x) => x.id === s.person);
-        html += `<tr><td class="num">${i + 1}</td><td>${s.title}</td><td>${p ? p.name : 'Compartida'}</td><td class="num">${fmt(s.minutes || 0)}</td><td class="num">${fmt(acc)}</td></tr>`;
+        html += `<tr><td class="num">${i + 1}</td><td>${s.title}</td><td>${p ? p.id : '—'}</td><td class="num">${fmt(s.minutes || 0)}</td><td class="num">${fmt(acc)}</td></tr>`;
       });
       html += '</tbody></table>';
 
       groups.forEach((g) => {
         if (!g.id) return;
-        html += `<h2 style="--c:${color[g.id]}">Bloque ${g.id} · ${g.block} — ${g.name} (${fmt(mins(g.id))} min)</h2>`;
+        html += `<h2 style="--c:${color[g.id]}">Bloque ${g.id} · ${g.block} (${fmt(mins(g.id))} min)</h2>`;
         S.forEach((s, i) => {
           if (s.person !== g.id) return;
           html += `<h3>${i + 1}. ${s.title}</h3><div class="meta">${fmt(s.minutes || 0)} min${s.refs ? ' · Fuentes: ' + s.refs.map((r) => '[' + window.REFS.byId[r].n + ']').join(' ') : ''}</div><div class="notes">${s.notes || ''}</div>`;

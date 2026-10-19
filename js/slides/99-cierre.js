@@ -16,7 +16,7 @@
       return {};
     },
     notes: String.raw`
-      <p>Diapositiva compartida para el turno de preguntas. Cada expositor responde las preguntas de su bloque.</p>
+      <p>Diapositiva compartida para el turno de preguntas. Cada bloque responde las preguntas de su tema.</p>
       <ul><li>La lista se puede desplazar con la rueda del ratón.</li>
       <li>Cada cita del pie de las diapositivas usa el mismo número que esta lista.</li></ul>`,
   });

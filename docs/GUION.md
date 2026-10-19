@@ -2,60 +2,60 @@
 
 > Archivo generado con `node tools/export-guion.js` a partir de `js/slides/*.js`. No editar a mano.
 
-**37 diapositivas · 33,5 min previstos** (sin preguntas). Objetivo: 30–40 min, ≈ 8 min por persona.
+**37 diapositivas · 33,5 min previstos** (sin preguntas). Objetivo: 30–40 min, ≈ 8 min por bloque.
 
-| Bloque | Expositor | Diapositivas | Minutos |
-|---|---|--:|--:|
-| Portada y cierre (compartidas) | — | 2 | 1,0 |
-| Contexto y fundamentos | Persona 1 | 9 | 8,2 |
-| Arquitectura y cifrado | Persona 2 | 8 | 8,1 |
-| Ejemplo práctico y descifrado | Persona 3 | 8 | 8,3 |
-| Criptoanálisis y seguridad | Persona 4 | 10 | 7,9 |
-| **Total** | | **37** | **33,5** |
+| Bloque | Diapositivas | Minutos |
+|---|--:|--:|
+| Portada y cierre (compartidas) | 2 | 1,0 |
+| Bloque 1 · Contexto y fundamentos | 9 | 8,2 |
+| Bloque 2 · Arquitectura y cifrado | 8 | 8,1 |
+| Bloque 3 · Ejemplo práctico y descifrado | 8 | 8,3 |
+| Bloque 4 · Criptoanálisis y seguridad | 10 | 7,9 |
+| **Total** | **37** | **33,5** |
 
 ## Mapa de diapositivas
 
-| # | Diapositiva | Responsable | Min | Acumulado | Interactiva |
+| # | Diapositiva | Bloque | Min | Acumulado | Interactiva |
 |--:|---|---|--:|--:|:-:|
-| 1 | Portada | Compartida | 0,5 | 0,5 |  |
-| 2 | Contexto y fundamentos | Persona 1 | 0,3 | 0,8 |  |
-| 3 | ¿Qué es IDEA? | Persona 1 | 0,8 | 1,6 |  |
-| 4 | Contexto histórico: ETH Zúrich, 1990–1992 | Persona 1 | 1,2 | 2,8 | ● |
-| 5 | El problema: las limitaciones de DES | Persona 1 | 1,1 | 3,9 |  |
-| 6 | Aplicación histórica: IDEA en PGP | Persona 1 | 0,9 | 4,8 |  |
-| 7 | Fundamentos: tres grupos sobre palabras de 16 bits | Persona 1 | 1,1 | 5,9 |  |
-| 8 | Laboratorio: las tres operaciones | Persona 1 | 1,4 | 7,3 | ● |
-| 9 | ¿Por qué mezclar operaciones incompatibles? | Persona 1 | 1,0 | 8,3 | ● |
-| 10 | Conclusión del bloque 1 | Persona 1 | 0,4 | 8,7 |  |
-| 11 | Arquitectura y cifrado | Persona 2 | 0,3 | 9,0 |  |
-| 12 | Estructura general | Persona 2 | 1,3 | 10,3 | ● |
-| 13 | 52 subclaves por rotaciones de 25 bits | Persona 2 | 1,4 | 11,7 | ● |
-| 14 | Organización de una ronda | Persona 2 | 1,2 | 12,9 | ● |
-| 15 | La caja de multiplicación-adición (MA) | Persona 2 | 0,9 | 13,8 | ● |
-| 16 | Cifrado ronda por ronda | Persona 2 | 1,9 | 15,7 | ● |
-| 17 | Del texto en claro al texto cifrado | Persona 2 | 0,7 | 16,4 | ● |
-| 18 | Conclusión del bloque 2 | Persona 2 | 0,4 | 16,8 |  |
-| 19 | Ejemplo práctico y descifrado | Persona 3 | 0,3 | 17,1 |  |
-| 20 | Datos del ejemplo y preparación | Persona 3 | 1,0 | 18,1 | ● |
-| 21 | Ronda 1, operación por operación | Persona 3 | 1,6 | 19,7 | ● |
-| 22 | Rondas 2 a 8 y transformación final | Persona 3 | 0,9 | 20,6 | ● |
-| 23 | Descifrar: el mismo circuito, otras subclaves | Persona 3 | 1,0 | 21,6 |  |
-| 24 | Inversión y reordenamiento de las subclaves | Persona 3 | 1,3 | 22,9 | ● |
-| 25 | Laboratorio de cifrado y descifrado | Persona 3 | 1,8 | 24,7 | ● |
-| 26 | Conclusión del bloque 3 | Persona 3 | 0,4 | 25,1 |  |
-| 27 | Criptoanálisis y seguridad | Persona 4 | 0,3 | 25,4 |  |
-| 28 | Espacio de claves: 2¹²⁸ | Persona 4 | 0,9 | 26,3 | ● |
-| 29 | Seguridad teórica y seguridad práctica | Persona 4 | 0,8 | 27,1 | ● |
-| 30 | Claves débiles | Persona 4 | 0,9 | 28,0 | ● |
-| 31 | Ataques publicados: rondas reducidas e IDEA completo | Persona 4 | 1,2 | 29,2 | ● |
-| 32 | Fuerza bruta frente a ataques que explotan la estructura | Persona 4 | 0,8 | 30,0 | ● |
-| 33 | Ventajas y desventajas técnicas | Persona 4 | 0,8 | 30,8 |  |
-| 34 | Patentes, licencias y la transición hacia AES | Persona 4 | 0,8 | 31,6 |  |
-| 35 | DES, IDEA y AES: comparación conceptual | Persona 4 | 0,8 | 32,4 | ● |
-| 36 | ¿Es relevante IDEA hoy? | Persona 4 | 0,6 | 33,0 |  |
-| 37 | Preguntas · Bibliografía | Compartida | 0,5 | 33,5 | ● |
+| 1 | Portada | — | 0,5 | 0,5 | ● |
+| 2 | Contexto y fundamentos | 1 | 0,3 | 0,8 |  |
+| 3 | ¿Qué es IDEA? | 1 | 0,8 | 1,6 |  |
+| 4 | Contexto histórico: ETH Zúrich, 1990–1992 | 1 | 1,2 | 2,8 | ● |
+| 5 | El problema: las limitaciones de DES | 1 | 1,1 | 3,9 |  |
+| 6 | Aplicación histórica: IDEA en PGP | 1 | 0,9 | 4,8 |  |
+| 7 | Fundamentos: tres grupos sobre palabras de 16 bits | 1 | 1,1 | 5,9 |  |
+| 8 | Laboratorio: las tres operaciones | 1 | 1,4 | 7,3 | ● |
+| 9 | ¿Por qué mezclar operaciones incompatibles? | 1 | 1,0 | 8,3 | ● |
+| 10 | Conclusión del bloque 1 | 1 | 0,4 | 8,7 |  |
+| 11 | Arquitectura y cifrado | 2 | 0,3 | 9,0 |  |
+| 12 | Estructura general | 2 | 1,3 | 10,3 | ● |
+| 13 | 52 subclaves por rotaciones de 25 bits | 2 | 1,4 | 11,7 | ● |
+| 14 | Organización de una ronda | 2 | 1,2 | 12,9 | ● |
+| 15 | La caja de multiplicación-adición (MA) | 2 | 0,9 | 13,8 | ● |
+| 16 | Cifrado ronda por ronda | 2 | 1,9 | 15,7 | ● |
+| 17 | Del texto en claro al texto cifrado | 2 | 0,7 | 16,4 | ● |
+| 18 | Conclusión del bloque 2 | 2 | 0,4 | 16,8 |  |
+| 19 | Ejemplo práctico y descifrado | 3 | 0,3 | 17,1 |  |
+| 20 | Datos del ejemplo y preparación | 3 | 1,0 | 18,1 | ● |
+| 21 | Ronda 1, operación por operación | 3 | 1,6 | 19,7 | ● |
+| 22 | Rondas 2 a 8 y transformación final | 3 | 0,9 | 20,6 | ● |
+| 23 | Descifrar: el mismo circuito, otras subclaves | 3 | 1,0 | 21,6 |  |
+| 24 | Inversión y reordenamiento de las subclaves | 3 | 1,3 | 22,9 | ● |
+| 25 | Laboratorio de cifrado y descifrado | 3 | 1,8 | 24,7 | ● |
+| 26 | Conclusión del bloque 3 | 3 | 0,4 | 25,1 |  |
+| 27 | Criptoanálisis y seguridad | 4 | 0,3 | 25,4 |  |
+| 28 | Espacio de claves: 2¹²⁸ | 4 | 0,9 | 26,3 | ● |
+| 29 | Seguridad teórica y seguridad práctica | 4 | 0,8 | 27,1 | ● |
+| 30 | Claves débiles | 4 | 0,9 | 28,0 | ● |
+| 31 | Ataques publicados: rondas reducidas e IDEA completo | 4 | 1,2 | 29,2 | ● |
+| 32 | Fuerza bruta frente a ataques que explotan la estructura | 4 | 0,8 | 30,0 | ● |
+| 33 | Ventajas y desventajas técnicas | 4 | 0,8 | 30,8 |  |
+| 34 | Patentes, licencias y la transición hacia AES | 4 | 0,8 | 31,6 |  |
+| 35 | DES, IDEA y AES: comparación conceptual | 4 | 0,8 | 32,4 | ● |
+| 36 | ¿Es relevante IDEA hoy? | 4 | 0,6 | 33,0 |  |
+| 37 | Preguntas · Bibliografía | — | 0,5 | 33,5 | ● |
 
-## Bloque 1 · Contexto y fundamentos — Persona 1 (8,2 min)
+## Bloque 1 · Contexto y fundamentos (8,2 min)
 
 ### 2. Contexto y fundamentos · 0,3 min
 
@@ -67,7 +67,7 @@
 
 > «Lo que lo hace especial no es su tamaño ni su velocidad, sino su principio de diseño. DES usa tablas de sustitución, las cajas S. IDEA, en cambio, consigue la no linealidad mezclando tres operaciones aritméticas que pertenecen a grupos algebraicos distintos. Esa idea guía toda la presentación.»
 
-- No dar aquí el tamaño de bloque ni de clave: lo presenta la Persona 2.
+- No dar aquí el tamaño de bloque ni de clave: lo presenta el bloque 2.
 
 - Si preguntan por el nombre: IDEA = *International Data Encryption Algorithm*.
 
@@ -77,7 +77,7 @@
 
 > «Ese mismo año, Biham y Shamir presentaron el criptoanálisis diferencial, una técnica nueva que obligó a revisar muchos diseños. En 1991, Lai, Massey y Murphy estudiaron esa amenaza con la teoría de los cifradores de Markov y reforzaron PES. El resultado se llamó IPES, *Improved* PES. En 1992 la tesis doctoral de Lai lo presenta ya como IDEA, junto con el vector de prueba que usará mi compañero en el bloque 3.»
 
-- El diseño se hizo con un contrato de investigación de la Fundación Hasler, luego integrada en Ascom-Tech AG. Las patentes las cuenta la Persona 4.
+- El diseño se hizo con un contrato de investigación de la Fundación Hasler, luego integrada en Ascom-Tech AG. Las patentes las cuenta el bloque 4.
 
 - Recorrer con **.** (siguiente hito) sin cambiar de diapositiva.
 
@@ -89,7 +89,7 @@
 
 > «IDEA se propuso resolver los tres: una clave mucho más larga, operaciones naturales para un procesador de 16 bits y un diseño justificado frente al ataque diferencial.»
 
-- No dar todavía los 128 bits de IDEA: decir solo «mucho más larga». La cifra la da la Persona 2.
+- No dar todavía los 128 bits de IDEA: decir solo «mucho más larga». La cifra la da el bloque 2.
 
 ### 6. Aplicación histórica: IDEA en PGP · 0,9 min · fuentes [9] [10]
 
@@ -97,7 +97,7 @@
 
 > «PGP usa un esquema híbrido. Para cada mensaje genera una clave de sesión aleatoria y cifra el texto con IDEA, que es rápido. Después cifra solo esa clave con RSA, usando la clave pública del destinatario. Así IDEA pasó a proteger el correo de usuarios de todo el mundo durante los años noventa.»
 
-- Las licencias y patentes de IDEA, que influyeron en la evolución de PGP, las trata la Persona 4.
+- Las licencias y patentes de IDEA, que influyeron en la evolución de PGP, las trata el bloque 4.
 
 ### 7. Fundamentos: tres grupos sobre palabras de 16 bits · 1,1 min · fuentes [1] [4]
 
@@ -109,7 +109,7 @@
 
 - Dato útil: $2^{16} \equiv -1 \pmod{65537}$, así que multiplicar por la palabra 0 equivale a cambiar de signo.
 
-- No entrar en cómo se usan los inversos para descifrar: es tema de la Persona 3.
+- No entrar en cómo se usan los inversos para descifrar: es tema de el bloque 3.
 
 ### 8. Laboratorio: las tres operaciones · 1,4 min · fuentes [3]
 
@@ -139,7 +139,7 @@
 
 - Pasar la palabra sin adelantar rondas ni subclaves.
 
-## Bloque 2 · Arquitectura y cifrado — Persona 2 (8,1 min)
+## Bloque 2 · Arquitectura y cifrado (8,1 min)
 
 ### 11. Arquitectura y cifrado · 0,3 min
 
@@ -165,7 +165,7 @@
 
 - La clave de ejemplo es el texto ASCII «XuejiaLai&Massey».
 
-- Una observación sin desarrollarla: la planificación solo selecciona bits, no los mezcla. Sus consecuencias de seguridad las analiza la Persona 4.
+- Una observación sin desarrollarla: la planificación solo selecciona bits, no los mezcla. Sus consecuencias de seguridad las analiza el bloque 4.
 
 ### 14. Organización de una ronda · 1,2 min · fuentes [1] [5]
 
@@ -185,7 +185,7 @@
 
 > «Después, t se combina con XOR con las palabras 1 y 3, y u con las palabras 2 y 4. Así el efecto de la caja MA llega a todo el bloque.»
 
-- No adelantar por qué esta estructura facilita el descifrado: lo explica la Persona 3.
+- No adelantar por qué esta estructura facilita el descifrado: lo explica el bloque 3.
 
 ### 16. Cifrado ronda por ronda · 1,9 min · fuentes [3]
 
@@ -199,7 +199,7 @@
 
 - «⟲ Reiniciar» vuelve al principio. «▷ Auto» reproduce sola la animación.
 
-- El ejemplo numérico «oficial» y su verificación los presenta la Persona 3; aquí no se detallan.
+- El ejemplo numérico «oficial» y su verificación los presenta el bloque 3; aquí no se detallan.
 
 ### 17. Del texto en claro al texto cifrado · 0,7 min · fuentes [1]
 
@@ -213,7 +213,7 @@
 
 > «Recapitulando: 64 bits de bloque, 128 de clave, 52 subclaves y 8 rondas y media, con la caja MA como núcleo de cada ronda. Mi compañero ahora hará el cálculo completo con un ejemplo publicado y explicará cómo se descifra.»
 
-## Bloque 3 · Ejemplo práctico y descifrado — Persona 3 (8,3 min)
+## Bloque 3 · Ejemplo práctico y descifrado (8,3 min)
 
 ### 19. Ejemplo práctico y descifrado · 0,3 min
 
@@ -283,7 +283,7 @@
 
 > «Hemos comprobado con números reales que el cifrado da el resultado publicado y que el descifrado recupera el original. La pregunta que queda es si es seguro. Eso lo responde mi compañero.»
 
-## Bloque 4 · Criptoanálisis y seguridad — Persona 4 (7,9 min)
+## Bloque 4 · Criptoanálisis y seguridad (7,9 min)
 
 ### 27. Criptoanálisis y seguridad · 0,3 min
 

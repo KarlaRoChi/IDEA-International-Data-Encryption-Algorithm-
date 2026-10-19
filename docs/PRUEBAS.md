@@ -24,8 +24,8 @@ Fecha: 18 de octubre de 2026 · Node.js 24.21.0 · OpenSSL 3.5.9 · Windows 11.
 | Prueba | Resultado |
 |---|---|
 | `index.html` carga los archivos de diapositivas en el orden acordado | ✔ |
-| Orden estricto de los expositores: portada → 1 → 2 → 3 → 4 → cierre, sin intercalar | ✔ |
-| Cada bloque empieza con portada (identifica al expositor), termina con conclusión y transición al siguiente y tiene al menos una interacción | ✔ |
+| Orden estricto de los bloques: portada → 1 → 2 → 3 → 4 → cierre, sin intercalar | ✔ |
+| Cada bloque empieza con portada (identifica el bloque), termina con conclusión y transición al siguiente y tiene al menos una interacción | ✔ |
 | Duración total entre 30 y 40 min y cada bloque entre 7 y 9 min | ✔ (33,5 min; 8,2 / 8,1 / 8,3 / 7,9) |
 | Todas las diapositivas tienen título, tiempo y notas | ✔ |
 | Todas las citas existen, todas las referencias se citan y todas tienen URL https | ✔ |
@@ -36,7 +36,7 @@ Fecha: 18 de octubre de 2026 · Node.js 24.21.0 · OpenSSL 3.5.9 · Windows 11.
 
 | Verificación | Resultado |
 |---|---|
-| Ejemplo de la Persona 2 (P = 4944 4541 3139 3931, K = 5875…6579) cifrado con OpenSSL | `D135 E4D6 C1FE 336D`, igual al visualizador |
+| Ejemplo de el bloque 2 (P = 4944 4541 3139 3931, K = 5875…6579) cifrado con OpenSSL | `D135 E4D6 C1FE 336D`, igual al visualizador |
 | Mapa de bits de clave por ronda (bloque 4) frente a la planificación real de claves (200 claves aleatorias) | 0 discrepancias |
 | Cifras del bloque 4: 2¹²⁸ / 2¹²⁶·⁰⁶ ≈ 3,8; con 10¹⁸ claves/s, 2¹²⁸ → ≈ 1,1·10¹³ años (≈ 781 × edad del universo); al máximo de los deslizadores (10²⁴ claves/s) → ≈ 1,1·10⁷ años | Comprobado numéricamente; las notas se corrigieron para reflejarlo |
 | DOI de la bibliografía (Crossref) y metadatos de los RFC (rfc-editor.org) | Todos resuelven, con título y páginas coincidentes |
