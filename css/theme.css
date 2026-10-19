@@ -1,0 +1,88 @@
+/* ===========================================================
+   Tokens de diseño: colores, tipografía y escala
+   =========================================================== */
+:root {
+  color-scheme: dark;
+
+  /* Fondo y superficies (azul marino / grafito) */
+  --bg: #070d1a;
+  --bg-2: #0b1324;
+  --surface: #0f1a30;
+  --surface-2: #14213b;
+  --line: #22314f;
+  --line-soft: #1a2742;
+
+  /* Texto */
+  --text: #e8eef9;
+  --text-2: #b6c3da;
+  --muted: #7f90ae;
+
+  /* Operaciones de IDEA: un color por grupo algebraico (usar SIEMPRE así) */
+  --xor: #22d3ee;     /* ⊕  XOR, (Z_2)^16          */
+  --add: #4ade80;     /* ⊞  suma mód 2^16          */
+  --mul: #c084fc;     /* ⊙  multiplicación mód 2^16+1 */
+  --xor-bg: rgba(34, 211, 238, .12);
+  --add-bg: rgba(74, 222, 128, .12);
+  --mul-bg: rgba(192, 132, 252, .14);
+
+  /* Expositores */
+  --p1: #7aa2ff;
+  --p2: #facc15;
+  --p3: #fb7185;
+  --p4: #fb923c;
+
+  /* Estados */
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --bad: #f87171;
+  --key: #fcd34d;      /* subclaves */
+
+  --radius: 14px;
+  --radius-sm: 9px;
+
+  --font: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono', 'Cascadia Code', Consolas, 'SFMono-Regular', Menlo, monospace;
+
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--xor); }
+
+kbd {
+  font-family: var(--mono);
+  font-size: .82em;
+  padding: .1em .45em;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); }
+
+/* Colores de operación reutilizables */
+.op-xor { color: var(--xor); }
+.op-add { color: var(--add); }
+.op-mul { color: var(--mul); }
+.k { color: var(--key); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

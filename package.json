@@ -1,0 +1,11 @@
+{
+  "name": "idea-presentacion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Presentación interactiva sobre el algoritmo IDEA (sitio estático, sin dependencias).",
+  "scripts": {
+    "test": "node --test tests/idea.test.js tests/content.test.js",
+    "guion": "node tools/export-guion.js",
+    "serve": "python -m http.server 8000"
+  }
+}

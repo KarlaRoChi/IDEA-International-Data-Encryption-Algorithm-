@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guion y tiempos · IDEA</title>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <style>
+    :root { --bg: #ffffff; --text: #111827; --muted: #6b7280; --line: #e5e7eb; --p1: #3b6fe0; --p2: #b8860b; --p3: #d6365a; --p4: #d9661a; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b1324; --text: #e8eef9; --muted: #8b9bb8; --line: #22314f; } }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 Inter, 'Segoe UI', system-ui, sans-serif; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px 16px 64px; }
+    h1 { font-size: 30px; margin: 0 0 4px; }
+    h2 { font-size: 22px; margin: 40px 0 6px; padding-top: 12px; border-top: 4px solid var(--c); }
+    h3 { font-size: 17px; margin: 22px 0 4px; }
+    .muted { color: var(--muted); }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0 18px; font-size: 14px; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+    .meta { font-size: 13px; color: var(--muted); }
+    .notes { border-left: 3px solid var(--line); padding-left: 14px; }
+    .notes .script { font-style: italic; }
+    .toolbar { display: flex; gap: 10px; margin: 12px 0 0; }
+    .toolbar a, .toolbar button { font: inherit; font-size: 14px; color: inherit; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; text-decoration: none; }
+    .bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin: 8px 0 4px; }
+    .bar span { display: block; height: 100%; }
+    @media print { .toolbar { display: none; } h2 { break-before: page; } body { font-size: 12px; } }
+  </style>
+</head>
+<body>
+  <main id="out">
+    <h1>Guion y distribución de tiempos</h1>
+    <p class="muted">Generado automáticamente a partir de las diapositivas (<code>js/slides/*.js</code>). Si cambias una nota o un tiempo, esta página se actualiza sola.</p>
+    <div class="toolbar"><a href="index.html">← Volver a la presentación</a><button onclick="print()">Imprimir / guardar PDF</button></div>
+  </main>
+
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/katex/auto-render.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data/references.js"></script>
+  <script>window.Widgets = {};</script>
+  <script src="js/slides/00-apertura.js"></script>
+  <script src="js/slides/01-contexto-fundamentos.js"></script>
+  <script src="js/slides/02-arquitectura-cifrado.js"></script>
+  <script src="js/slides/03-ejemplo-descifrado.js"></script>
+  <script src="js/slides/04-criptoanalisis-seguridad.js"></script>
+  <script src="js/slides/99-cierre.js"></script>
+  <script>
+    (function () {
+      const cfg = window.DECK_CONFIG, S = window.SLIDES, out = document.getElementById('out');
+      const color = { 0: '#9ca3af', 1: 'var(--p1)', 2: 'var(--p2)', 3: 'var(--p3)', 4: 'var(--p4)' };
+      const fmt = (m) => m.toFixed(1).replace('.', ',');
+      const total = S.reduce((a, s) => a + (s.minutes || 0), 0);
+      const groups = [{ id: 0, name: 'Compartidas', block: 'Portada y cierre' }, ...cfg.presenters];
+      const mins = (id) => S.filter((s) => (s.person || 0) === id).reduce((a, s) => a + (s.minutes || 0), 0);
+
+      let html = `<h2 style="--c:#9ca3af">Resumen</h2>
+        <p>${S.length} diapositivas · duración prevista <b>${fmt(total)} min</b> (sin preguntas).</p>
+        <div class="bar">${groups.map((g) => `<span style="flex:${mins(g.id)};background:${color[g.id]}" title="${g.block}"></span>`).join('')}</div>
+        <table><thead><tr><th>Bloque</th><th>Expositor</th><th class="num">Diapositivas</th><th class="num">Minutos</th></tr></thead><tbody>
+        ${groups.map((g) => `<tr><td>${g.block}</td><td>${g.id ? g.name : '—'}</td><td class="num">${S.filter((s) => (s.person || 0) === g.id).length}</td><td class="num">${fmt(mins(g.id))}</td></tr>`).join('')}
+        <tr><th>Total</th><td></td><td class="num">${S.length}</td><td class="num"><b>${fmt(total)}</b></td></tr></tbody></table>
+        <h3>Tiempo por diapositiva</h3>
+        <table><thead><tr><th>#</th><th>Diapositiva</th><th>Responsable</th><th class="num">Min</th><th class="num">Acumulado</th></tr></thead><tbody>`;
+      let acc = 0;
+      S.forEach((s, i) => {
+        acc += s.minutes || 0;
+        const p = cfg.presenters.find((x) => x.id === s.person);
+        html += `<tr><td class="num">${i + 1}</td><td>${s.title}</td><td>${p ? p.name : 'Compartida'}</td><td class="num">${fmt(s.minutes || 0)}</td><td class="num">${fmt(acc)}</td></tr>`;
+      });
+      html += '</tbody></table>';
+
+      groups.forEach((g) => {
+        if (!g.id) return;
+        html += `<h2 style="--c:${color[g.id]}">Bloque ${g.id} · ${g.block} — ${g.name} (${fmt(mins(g.id))} min)</h2>`;
+        S.forEach((s, i) => {
+          if (s.person !== g.id) return;
+          html += `<h3>${i + 1}. ${s.title}</h3><div class="meta">${fmt(s.minutes || 0)} min${s.refs ? ' · Fuentes: ' + s.refs.map((r) => '[' + window.REFS.byId[r].n + ']').join(' ') : ''}</div><div class="notes">${s.notes || ''}</div>`;
+        });
+      });
+      html += `<h2 style="--c:#9ca3af">Diapositivas compartidas</h2>` + S.filter((s) => !s.person).map((s) => `<h3>${s.title}</h3><div class="notes">${s.notes || ''}</div>`).join('');
+      out.insertAdjacentHTML('beforeend', html);
+      renderMathInElement(out, { delimiters: [{ left: '\\[', right: '\\]', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false });
+    })();
+  </script>
+</body>
+</html>
