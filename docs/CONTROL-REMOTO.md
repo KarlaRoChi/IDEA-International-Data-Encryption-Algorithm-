@@ -46,9 +46,9 @@ Permite que los compañeros manejen la presentación desde su celular o computad
 
 | Mensaje | Quién lo envía | Contenido |
 |---|---|---|
-| `cmd` | remoto | `{ t:'CMD', v:1, id, from, cmd, base, slide? }`, donde `cmd` ∈ `NEXT`, `PREVIOUS`, `GOTO_SLIDE`, `GO_TO_START`, `GO_TO_END`, `DEMO_NEXT`, `DEMO_PREV`, `DEMO_RESET`, `DEMO_ALL` |
+| `cmd` | remoto | `{ t:'CMD', v:1, id, from, cmd, base, slide?, act?, label? }`, donde `cmd` ∈ `NEXT`, `PREVIOUS`, `GOTO_SLIDE`, `GO_TO_START`, `GO_TO_END`, `DEMO_ACTION` (y `DEMO_NEXT`, `DEMO_PREV`, `DEMO_RESET`, `DEMO_ALL`, que se mantienen por compatibilidad) |
 | `hello` | remoto | pide el estado actual (al entrar, al reconectar y al volver a la pestaña) |
-| `state` | presentadora | `{ epoch, version, slide, total, title, block, pos, demo, slides?, blocks? }` |
+| `state` | presentadora | `{ epoch, version, dseq, slide, total, title, block, pos, demo, actions, status, slides?, blocks? }` |
 | `closed` | presentadora | la sesión terminó |
 
 Reglas de la presentadora (`RemoteHost`):
@@ -64,7 +64,7 @@ Reglas de la presentadora (`RemoteHost`):
 | Desconexión | El remoto reintenta (Supabase reconecta solo), pide el estado con `hello` y avisa «sin presentador» si no recibe nada en 25 s (hay un latido cada 10 s) |
 | Sesión cerrada | La presentadora deja de aceptar comandos, avisa con `closed` y cierra la sala en el servidor |
 
-**Pasos de las demostraciones:** son opcionales. La presentadora los activa en el panel («Permitir pasos de las demostraciones»). Entonces, en las diapositivas con demo, el remoto muestra «⟲ · ◀ Paso · Paso ▶ · Toda la ronda ⏩» (⟲ y ⏩ se activan solo si la demo los admite). Esos botones ejecutan los mismos `next/prev` que las teclas `.` y `,` y **nunca cambian de diapositiva**.
+**Controles de las demostraciones (todos, detectados automáticamente):** son opcionales. La presentadora los activa en el panel («Permitir que los controles avancen los pasos de las demostraciones»). Entonces la presentación publica **todos los controles visibles de la demo actual** con su etiqueta real, agrupados y con su estado (activo o desactivado): botones de pasos (⟲, ◀ Paso, Paso ▶, Ronda ⏮/⏭, Toda la ronda ⏩, Ejecutar todo, ▷ Auto/❚❚ Pausa, Descifrar el resultado…), saltos R1…R8, pestañas, ejemplos predefinidos (incluidas las opciones de los desplegables), hitos y filas seleccionables, y deslizadores (− / +, con su valor). También publica el contador de la demo («17 / 134»). El remoto los muestra igual que en la diapositiva y, al pulsar uno, la presentación ejecuta ese mismo control. Antes comprueba que la etiqueta coincide y que el control está activo: el comando `DEMO_ACTION` lleva el índice y la etiqueta. Los cambios de la demo, incluida la reproducción automática, se publican con un contador propio (`dseq`) que no invalida la navegación entre diapositivas. Ningún control de demo cambia de diapositiva. Las demos nuevas aparecen en el remoto sin programar nada.
 
 ## Configurar Supabase (opcional, una vez, unos 10 minutos)
 

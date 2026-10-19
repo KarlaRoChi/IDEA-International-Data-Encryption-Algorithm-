@@ -23,6 +23,7 @@
   let transport = null;
   let host = null;
   let heartbeat = null;
+  let demoPoll = null;
   let session = null;      // { code, url, expiresAt, mode }
   let status = 'inactivo';
   let remotes = 0;
@@ -119,17 +120,108 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Controles de la demostración actual, detectados automáticamente     */
+  /* Cada botón, pestaña, ejemplo (select) o deslizador de la diapositiva */
+  /* se publica con su etiqueta real; el remoto puede usar todos.        */
+  /* ------------------------------------------------------------------ */
+  const clean = (t) => String(t || '').replace(/\s+/g, ' ').trim();
+  // Texto visible con espacios entre elementos («1977 DES…», no «1977DES…»)
+  function textOf(el) {
+    const parts = [];
+    const walk = (n) => n.childNodes.forEach((c) => {
+      if (c.nodeType === 3) parts.push(c.textContent);
+      else if (c.nodeType === 1 && !c.classList.contains('katex-mathml')) walk(c);
+    });
+    walk(el);
+    return clean(parts.join(' ')).replace(/\s+([,.;:)])/g, '$1');
+  }
+  function labelOf(el) {
+    const text = textOf(el);
+    const hint = clean(el.getAttribute('title') || el.getAttribute('aria-label')).replace(/\s*\(.*\)$/, '');
+    // Botones de solo un símbolo (⟲, ✕…): se añade su descripción
+    const label = text.length <= 2 && hint ? `${text} ${hint}`.trim() : text || hint || '·';
+    return label.slice(0, 60);
+  }
+  function fieldLabel(el) {
+    const f = el.closest('label, .field, .slider');
+    const span = f && f.querySelector('span');
+    return clean(span ? span.textContent : '').slice(0, 40);
+  }
+  function groupOf(el) {
+    if (el.closest('.demo-controls, .ks-buttons, .traj-controls')) return 'Pasos';
+    if (el.classList.contains('rail-btn')) return 'Ir a';
+    if (el.classList.contains('tab')) return 'Vista';
+    if (el.classList.contains('chip')) return 'Ejemplos';
+    if (el.classList.contains('tl-ev')) return 'Línea de tiempo';
+    if (el.classList.contains('layer')) return 'Capas';
+    if (el.classList.contains('att-row')) return 'Ataques';
+    if (el.closest('.rviz-top, .lab-top, .bs-controls, .laws-head, .weak-top')) return 'Datos';
+    return 'Opciones';
+  }
+  const isOn = (el) => ['active', 'sel', 'cur', 'on'].some((c) => el.classList.contains(c));
+  function demoControls() {
+    const slide = document.querySelector('#stage .slide');
+    if (!slide) return [];
+    const root = slide.querySelector('.body') || slide;
+    const out = [];
+    root.querySelectorAll('button, select, input[type=range]').forEach((el) => {
+      if (el.closest('.slide-foot') || el.getClientRects().length === 0) return;   // oculto
+      if (el.tagName === 'BUTTON') {
+        out.push({ el, kind: 'b', l: labelOf(el), g: groupOf(el), d: el.disabled, on: isOn(el) });
+      } else if (el.tagName === 'SELECT') {
+        const g = fieldLabel(el) || 'Opciones';
+        [...el.options].forEach((o) => {
+          if (o.hidden || o.disabled) return;
+          out.push({ el, kind: 'o', value: o.value, l: `${g}: ${clean(o.text)}`.slice(0, 60), g, on: o.selected && el.value === o.value });
+        });
+      } else {
+        // Grupo = nombre del deslizador y su valor actual; botones − y +
+        const shown = el.parentElement && el.parentElement.querySelector('b');
+        // 10<sup>12</sup> -> «10^12»
+        const val = shown ? clean(shown.innerHTML.replace(/<sup>/g, '^').replace(/<[^>]+>/g, '')) : '';
+        const g = `${fieldLabel(el) || 'Ajuste'}${val ? ` · ${val}` : ''}`.slice(0, 60);
+        out.push({ el, kind: 'r-', l: '− menos', g, d: +el.value <= +el.min });
+        out.push({ el, kind: 'r+', l: '+ más', g, d: +el.value >= +el.max });
+      }
+    });
+    return out.slice(0, RP.MAX_ACTIONS);
+  }
+  const publicActions = (list) => list.map((a) => ({ l: a.l, g: a.g, d: !!a.d, on: !!a.on }));
+  function demoStatus() {
+    const slide = document.querySelector('#stage .slide');
+    const c = slide && slide.querySelector('.body .pos-counter');
+    return c ? clean(c.textContent).slice(0, 80) : '';
+  }
+  function runControl(a) {
+    const el = a.el;
+    if (a.kind === 'b') el.click();
+    else if (a.kind === 'o') { el.value = a.value; el.dispatchEvent(new Event('change', { bubbles: true })); }
+    else {
+      const step = +el.step || 1;
+      const v = Math.min(+el.max, Math.max(+el.min, +el.value + (a.kind === 'r+' ? step : -step)));
+      el.value = String(v);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Estado publicado                                                    */
   /* ------------------------------------------------------------------ */
+  let lastDemoSig = '';
   function meta(withIndex) {
     const s = DECK.slides[DECK.current];
     const blocks = DECK.config.presenters.map((p) => ({ id: p.id, title: p.block }));
+    const actions = publicActions(demoControls());
+    const status = demoStatus();
+    lastDemoSig = JSON.stringify([DECK.current, actions, status]);
     const out = {
       title: (s.menuTitle || s.title || '').slice(0, 200),
       block: s.person || 0,
       pos: s.person ? `${s.posInSection}/${s.sectionSize}` : '',
-      demo: !!(DECK.controller && typeof DECK.controller.next === 'function'),
+      demo: actions.length > 0 || !!(DECK.controller && typeof DECK.controller.next === 'function'),
       caps: { reset: !!(DECK.controller && DECK.controller.reset), all: !!(DECK.controller && DECK.controller.all) },
+      actions,
+      status,
     };
     const st = host.state(out);
     if (withIndex) {
@@ -145,6 +237,20 @@
     host.localChange(e.detail.index);
     publish(false);
   });
+
+  // La demostración cambió (clic local o remoto, ejemplo, reproducción automática…):
+  // se publica un estado nuevo solo si cambió algo visible para los remotos.
+  function checkDemo() {
+    if (!host || host.closed || !host.allowDemo) return;
+    const sig = JSON.stringify([DECK.current, publicActions(demoControls()), demoStatus()]);
+    if (sig === lastDemoSig) return;
+    host.demoChange();
+    publish(false);
+  }
+  let demoTimer = null;
+  const soonCheck = () => { clearTimeout(demoTimer); demoTimer = setTimeout(checkDemo, 90); };
+  ['click', 'change', 'input', 'keyup'].forEach((ev) => document.getElementById('stage').addEventListener(ev, soonCheck, true));
+  document.addEventListener('keydown', soonCheck, true);
 
   /* ------------------------------------------------------------------ */
   /* Ciclo de vida de la sesión                                          */
@@ -166,6 +272,7 @@
       base.hash = `c=${r.code}&m=${RT.MODE_CODES[transport.kind]}`;
       session = { code: r.code, url: base.href, expiresAt: r.expiresAt, mode: transport.kind };
       heartbeat = setInterval(() => publish(true), 10000);
+      demoPoll = setInterval(checkDemo, 700);   // reproducción automática y otros cambios sin clic
       publish(true);
       renderActive();
       updateBadge();
@@ -178,6 +285,7 @@
 
   async function stop(silent) {
     clearInterval(heartbeat);
+    clearInterval(demoPoll);
     if (host) host.closed = true;
     if (transport) {
       try { if (!silent) transport.send('closed', { t: 'CLOSED', v: RP.PROTOCOL }); } catch (e) { /* sin conexión */ }
@@ -192,13 +300,21 @@
     if (!host) return;
     const s = DECK.slides[DECK.current];
     const c0 = DECK.controller;
-    const r = host.handle(m, Date.now(), { hasDemo: !!(c0 && c0.next), caps: { reset: !!(c0 && c0.reset), all: !!(c0 && c0.all) }, slide: s });
+    const controls = m && m.cmd === 'DEMO_ACTION' ? demoControls() : null;
+    const r = host.handle(m, Date.now(), {
+      hasDemo: !!(c0 && c0.next), caps: { reset: !!(c0 && c0.reset), all: !!(c0 && c0.all) }, slide: s,
+      actions: controls ? publicActions(controls) : null,
+    });
     if (!r.ok) { if (r.reason !== 'obsoleto' && r.reason !== 'limite') console.info('Comando remoto rechazado:', r.reason, m && m.cmd); return; }
     if (!r.action) { publish(false); return; }
     if (r.action.type === 'goto') DECK.go(r.action.index, { source: 'remote' });   // dispara deck:change -> publish
     else if (r.action.type === 'demo') {
       const c = DECK.controller;
       if (c && typeof c[r.action.op] === 'function') c[r.action.op]();
+      soonCheck();
+    } else if (r.action.type === 'demo-action') {
+      runControl(controls[r.action.index]);
+      soonCheck();
     }
   }
 

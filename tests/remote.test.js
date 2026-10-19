@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const P = require('../js/remote/protocol.js');
 
 const A = 'remoteA123', B = 'remoteB456';
-const cmd = (from, c, base, slide) => P.makeCommand(from, c, base, slide);
+const cmd = (from, c, base, slide, action) => P.makeCommand(from, c, base, slide, action);
 
 test('NEXT / PREVIOUS / inicio / fin / ir a N producen la acción correcta', () => {
   const h = new P.RemoteHost({ total: 10, index: 3 });
@@ -108,6 +108,40 @@ test('reconexión: un estado antiguo no devuelve la presentación atrás', () =>
   const old = { ...h.state(), version: 0, slide: 1 };
   assert.equal(tr.accept(old), false);
   assert.equal(tr.state.slide, 8);
+});
+
+test('DEMO_ACTION: ejecuta el control publicado si la etiqueta coincide y está activo', () => {
+  const h = new P.RemoteHost({ total: 10, allowDemo: true });
+  const actions = [{ l: '◀ Paso', d: true }, { l: 'Paso ▶' }, { l: 'Ejemplos: Vector de Lai (1992)' }];
+  const act = (i, label, t) => h.handle(cmd(A, 'DEMO_ACTION', 0, undefined, { act: i, label }), t, { actions });
+  assert.deepEqual(act(1, 'Paso ▶', 1000).action, { type: 'demo-action', index: 1 });
+  assert.equal(act(0, '◀ Paso', 2000).reason, 'accion-desactivada');
+  assert.equal(act(2, 'Otra cosa', 3000).reason, 'accion-desconocida');
+  assert.equal(act(9, 'Paso ▶', 4000).reason, 'accion-desconocida');
+  assert.equal(h.handle({ ...cmd(A, 'DEMO_ACTION', 0, undefined, { act: -1, label: 'x' }) }, 5000, { actions }).reason, 'accion');
+  assert.equal(h.handle({ ...cmd(A, 'NEXT', 0), act: 1 }, 6000).reason, 'accion');
+  h.allowDemo = false;
+  assert.equal(act(1, 'Paso ▶', 7000).reason, 'demo-desactivada');
+});
+
+test('DEMO_ACTION de una diapositiva anterior (versión vieja) se rechaza', () => {
+  const h = new P.RemoteHost({ total: 10, allowDemo: true });
+  h.localChange(4);
+  const r = h.handle(cmd(A, 'DEMO_ACTION', 0, undefined, { act: 0, label: 'Paso ▶' }), 1000, { actions: [{ l: 'Paso ▶' }] });
+  assert.equal(r.reason, 'obsoleto');
+});
+
+test('los cambios de la demo publican estados nuevos sin invalidar la navegación', () => {
+  const h = new P.RemoteHost({ total: 10, allowDemo: true });
+  const tr = new P.StateTracker();
+  assert.equal(tr.accept(h.state({ demo: true, actions: [{ l: 'Paso ▶' }], status: '1 / 134' })), true);
+  h.demoChange();
+  const s2 = h.state({ demo: true, actions: [{ l: 'Paso ▶' }], status: '2 / 134' });
+  assert.equal(tr.accept(s2), true);
+  assert.equal(tr.state.status, '2 / 134');
+  assert.equal(tr.accept(s2), false, 'repetido');
+  assert.equal(h.version, 0, 'la versión de navegación no cambia');
+  assert.equal(h.handle(cmd(A, 'NEXT', 0), 9000).ok, true, 'un «Siguiente» con la versión vista sigue siendo válido');
 });
 
 test('códigos de sala: 8 caracteres sin ambigüedades', () => {

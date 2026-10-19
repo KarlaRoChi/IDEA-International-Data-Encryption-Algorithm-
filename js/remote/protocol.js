@@ -21,8 +21,11 @@
   const PROTOCOL = 1;
   const NAV = ['NEXT', 'PREVIOUS', 'GOTO_SLIDE', 'GO_TO_START', 'GO_TO_END'];
   const DEMO = ['DEMO_NEXT', 'DEMO_PREV', 'DEMO_RESET', 'DEMO_ALL'];
-  const COMMANDS = new Set([...NAV, ...DEMO]);
-  const RELATIVE = new Set(['NEXT', 'PREVIOUS', ...DEMO]);
+  // DEMO_ACTION: ejecutar cualquier control de la demostración que la
+  // presentadora publica en su estado (botón, pestaña, ejemplo, deslizador…)
+  const COMMANDS = new Set([...NAV, ...DEMO, 'DEMO_ACTION']);
+  const RELATIVE = new Set(['NEXT', 'PREVIOUS', ...DEMO, 'DEMO_ACTION']);
+  const MAX_ACTIONS = 80;
   const ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
 
   // Alfabeto sin caracteres ambiguos (sin 0/O, 1/I/L) para códigos legibles
@@ -72,6 +75,10 @@
     if (!isInt(m.base) || m.base < 0) return 'version';
     if (m.cmd === 'GOTO_SLIDE' && !isInt(m.slide)) return 'diapositiva';
     if (m.cmd !== 'GOTO_SLIDE' && m.slide !== undefined) return 'diapositiva';
+    if (m.cmd === 'DEMO_ACTION') {
+      if (!isInt(m.act) || m.act < 0 || m.act >= MAX_ACTIONS) return 'accion';
+      if (typeof m.label !== 'string' || m.label.length > 80) return 'accion';
+    } else if (m.act !== undefined || m.label !== undefined) return 'accion';
     const keys = Object.keys(m);
     if (keys.length > 8) return 'formato';
     return null;
@@ -85,6 +92,12 @@
     if (!isInt(s.total) || s.total < 1 || s.total > 500) return false;
     if (!isInt(s.slide) || s.slide < 0 || s.slide >= s.total) return false;
     if (typeof s.title !== 'string' || s.title.length > 200) return false;
+    if (s.dseq !== undefined && (!isInt(s.dseq) || s.dseq < 0)) return false;
+    if (s.actions !== undefined && s.actions !== null) {
+      if (!Array.isArray(s.actions) || s.actions.length > MAX_ACTIONS) return false;
+      for (const a of s.actions) if (!a || typeof a.l !== 'string' || a.l.length > 80) return false;
+    }
+    if (s.status !== undefined && (typeof s.status !== 'string' || s.status.length > 80)) return false;
     return true;
   }
 
@@ -132,6 +145,13 @@
     /** Cambio de estado que no es de diapositiva (p. ej., permitir demos). */
     touch() { this.version += 1; }
 
+    /**
+     * La demostración cambió (paso, pestaña, ejemplo…). No sube la versión
+     * de navegación, para no invalidar los comandos de diapositiva en curso;
+     * usa un contador propio que los remotos comparan en segundo lugar.
+     */
+    demoChange() { this.dseq = (this.dseq || 0) + 1; }
+
     state(meta = {}) {
       return {
         t: 'STATE', v: PROTOCOL, epoch: this.epoch, version: this.version,
@@ -139,6 +159,9 @@
         title: meta.title || '', block: meta.block || 0, pos: meta.pos || '',
         demo: !!(meta.demo && this.allowDemo),
         caps: meta.demo && this.allowDemo ? { reset: !!(meta.caps && meta.caps.reset), all: !!(meta.caps && meta.caps.all) } : null,
+        dseq: this.dseq || 0,
+        actions: this.allowDemo && Array.isArray(meta.actions) ? meta.actions.slice(0, MAX_ACTIONS) : null,
+        status: this.allowDemo && meta.status ? String(meta.status).slice(0, 80) : '',
       };
     }
 
@@ -173,6 +196,16 @@
       if (!this._rateOk(m.from, now)) return { ok: false, reason: 'frecuencia' };
 
       if (RELATIVE.has(m.cmd) && m.base < this.version) return { ok: false, reason: 'obsoleto' };
+
+      if (m.cmd === 'DEMO_ACTION') {
+        if (!this.allowDemo) return { ok: false, reason: 'demo-desactivada' };
+        const list = Array.isArray(ctx.actions) ? ctx.actions : [];
+        const a = list[m.act];
+        // La etiqueta debe coincidir: evita ejecutar otro control si la lista cambió
+        if (!a || a.l !== m.label) return { ok: false, reason: 'accion-desconocida' };
+        if (a.d) return { ok: false, reason: 'accion-desactivada' };
+        return { ok: true, action: { type: 'demo-action', index: m.act } };
+      }
 
       if (DEMO.includes(m.cmd)) {
         if (!this.allowDemo) return { ok: false, reason: 'demo-desactivada' };
@@ -209,28 +242,31 @@
 
   /** Acepta solo estados más recientes; tolera mensajes fuera de orden. */
   class StateTracker {
-    constructor() { this.epoch = null; this.version = -1; this.ts = 0; this.state = null; }
+    constructor() { this.epoch = null; this.version = -1; this.dseq = -1; this.ts = 0; this.state = null; }
     accept(s) {
       if (!validateState(s)) return false;
+      const dseq = s.dseq || 0;
       if (s.epoch === this.epoch) {
-        if (s.version <= this.version) return false;          // viejo o repetido
+        // Orden: primero la versión de navegación, luego la de la demostración
+        if (s.version < this.version || (s.version === this.version && dseq <= this.dseq)) return false;
       } else if (this.epoch !== null && s.ts < this.ts) {
         return false;                                           // de una sesión anterior
       }
-      this.epoch = s.epoch; this.version = s.version; this.ts = s.ts; this.state = s;
+      this.epoch = s.epoch; this.version = s.version; this.dseq = dseq; this.ts = s.ts; this.state = s;
       return true;
     }
   }
 
   /** Construye un comando con id único y la versión que el remoto ha visto. */
-  function makeCommand(from, cmd, base, slide) {
+  function makeCommand(from, cmd, base, slide, action) {
     const m = { t: 'CMD', v: PROTOCOL, id: randomId(9), from, cmd, base: base < 0 ? 0 : base };
     if (cmd === 'GOTO_SLIDE') m.slide = slide;
+    if (cmd === 'DEMO_ACTION' && action) { m.act = action.act; m.label = action.label; }
     return m;
   }
 
   return {
-    PROTOCOL, NAV, DEMO, CODE_ALPHABET,
+    PROTOCOL, NAV, DEMO, CODE_ALPHABET, MAX_ACTIONS,
     randomId, randomCode, normalizeCode, isValidCode,
     validateCommand, validateState, makeCommand,
     RemoteHost, StateTracker,

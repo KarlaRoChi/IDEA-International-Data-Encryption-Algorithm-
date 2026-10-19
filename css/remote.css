@@ -122,3 +122,13 @@
 @media (min-width: 900px) { .rm-btn.big { min-height: 150px; } }
 .rm-demo-btns { display: grid; grid-template-columns: 52px 1fr 1fr 1.4fr; gap: 8px; }
 .rm-demo-btns .rm-btn { padding: 12px 6px; font-size: 15px; }
+
+/* Controles de la demostración (dinámicos, los mismos que en la diapositiva) */
+.rm-demo-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.rm-demo-h span { font-size: 13px; color: var(--mul); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+.rm-demo-h b { font-size: 13px; color: var(--text-2); }
+.rm-dgroup { margin-top: 8px; }
+.rm-dgroup-h { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 5px; }
+.rm-dgroup-b { display: flex; flex-wrap: wrap; gap: 6px; }
+.rm-dgroup-b .rm-btn { flex: 1 1 auto; min-width: 64px; padding: 10px 10px; font-size: 14px; border-radius: 10px; }
+.rm-dgroup-b .rm-btn.on { border-color: var(--mul); background: rgba(192, 132, 252, .16); color: #fff; }

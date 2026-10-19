@@ -97,10 +97,7 @@
     const bl = $('block');
     document.querySelector('.rm-now').style.setProperty('--c', s.block ? `var(--p${s.block})` : 'var(--text-2)');
     bl.innerHTML = s.block ? `<i>${s.block}</i>${escapeHtml(blockName(s.block))}${s.pos ? ` <span>· ${escapeHtml(s.pos)}</span>` : ''}` : '<i>·</i>Apertura y cierre';
-    $('demo').hidden = !s.demo;
-    const caps = s.caps && typeof s.caps === 'object' ? s.caps : {};
-    document.querySelector('[data-c="DEMO_RESET"]').disabled = !caps.reset;
-    document.querySelector('[data-c="DEMO_ALL"]').disabled = !caps.all;
+    renderDemo(s);
     // Barra de progreso por bloques
     if (slides.length) {
       $('progress').innerHTML = slides.map((x) => `<span class="${x.i < s.slide ? 'done' : x.i === s.slide ? 'cur' : ''}" style="--c:${x.b ? `var(--p${x.b})` : 'var(--text-2)'}"></span>`).join('');
@@ -108,6 +105,40 @@
     document.querySelectorAll('#slides button').forEach((b) => b.classList.toggle('cur', +b.dataset.i === s.slide));
     document.querySelectorAll('[data-c="PREVIOUS"],[data-c="GO_TO_START"]').forEach((b) => { b.disabled = s.slide === 0; });
     document.querySelectorAll('[data-c="NEXT"],[data-c="GO_TO_END"]').forEach((b) => { b.disabled = s.slide === s.total - 1; });
+  }
+
+  // Todos los controles de la demostración actual, tal como los publica la
+  // presentación: misma etiqueta, agrupados y con su estado (activo/desactivado).
+  function renderDemo(s) {
+    const actions = Array.isArray(s.actions) ? s.actions : [];
+    $('demo').hidden = !s.demo || actions.length === 0;
+    $('demo-status').textContent = typeof s.status === 'string' ? s.status : '';
+    const groups = [];
+    actions.forEach((a, i) => {
+      const g = String(a.g || 'Opciones').slice(0, 60);
+      let grp = groups.find((x) => x.g === g);
+      if (!grp) { grp = { g, items: [] }; groups.push(grp); }
+      // «Ejemplos: Todo ceros» dentro del grupo «Ejemplos» se muestra como «Todo ceros»
+      let l = String(a.l || '').slice(0, 80);
+      if (l.startsWith(g + ': ')) l = l.slice(g.length + 2);
+      grp.items.push({ i, l, d: !!a.d, on: !!a.on });
+    });
+    // Si solo cambió el estado de los botones, se actualizan en su sitio: rehacerlos
+    // durante la reproducción automática podría «perder» un toque en el celular.
+    const shape = JSON.stringify(groups.map((g) => [g.g, g.items.map((x) => x.l)]));
+    const box = $('demo-actions');
+    if (box.dataset.shape === shape) {
+      groups.forEach((g) => g.items.forEach((a) => {
+        const b = box.querySelector(`[data-act="${a.i}"]`);
+        if (b) { b.disabled = a.d; b.classList.toggle('on', a.on); }
+      }));
+      return;
+    }
+    box.dataset.shape = shape;
+    box.innerHTML = groups.map((g) => `
+      <div class="rm-dgroup"><div class="rm-dgroup-h">${escapeHtml(g.g)}</div><div class="rm-dgroup-b">
+        ${g.items.map((a) => `<button class="rm-btn small${a.on ? ' on' : ''}" data-act="${a.i}" ${a.d ? 'disabled' : ''}>${escapeHtml(a.l)}</button>`).join('')}
+      </div></div>`).join('');
   }
 
   function renderList() {
@@ -133,12 +164,12 @@
     if (on) waitTimer = setTimeout(() => setWaiting(false), 700);
   }
 
-  function send(cmd, slide) {
+  function send(cmd, slide, action) {
     if (!transport) return;
     const isDemo = cmd.startsWith('DEMO');
     if (waiting && !isDemo) return;
     const base = tracker.version < 0 ? 0 : tracker.version;
-    transport.send('cmd', RP.makeCommand(me, cmd, base, slide));
+    transport.send('cmd', RP.makeCommand(me, cmd, base, slide, action));
     if (!isDemo) setWaiting(true);
     if (navigator.vibrate) navigator.vibrate(12);
   }
@@ -146,6 +177,12 @@
   document.addEventListener('click', (e) => {
     const b = e.target.closest('[data-c]');
     if (b && !b.disabled) { send(b.dataset.c); return; }
+    const d = e.target.closest('[data-act]');
+    if (d && !d.disabled) {
+      const a = tracker.state && Array.isArray(tracker.state.actions) ? tracker.state.actions[+d.dataset.act] : null;
+      if (a) send('DEMO_ACTION', undefined, { act: +d.dataset.act, label: a.l });
+      return;
+    }
     const s = e.target.closest('#slides button');
     if (s) { send('GOTO_SLIDE', +s.dataset.i); $('list').open = false; }
   });

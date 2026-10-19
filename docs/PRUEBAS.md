@@ -4,7 +4,7 @@ Fecha: 18 de octubre de 2026 · Node.js 24.21.0 · OpenSSL 3.5.9 · Windows 11.
 
 ## 1. Pruebas automáticas (`npm test`)
 
-**Resultado: 33 de 33 superadas** (16 de algoritmo y contenido, 13 de protocolo y 4 de cifrado del canal).
+**Resultado: 36 de 36 superadas** (16 de algoritmo y contenido, 16 de protocolo y 4 de cifrado del canal).
 
 ### Algoritmo (`tests/idea.test.js`)
 
@@ -124,3 +124,17 @@ Probado el 19 de octubre de 2026 con el servidor público `broker.hivemq.com` (c
 | `tests/securechannel.test.js` | ✔ 4 de 4: tema determinista que no revela el código, ida y vuelta, IV aleatorio, rechazo de mensajes alterados, falsos o con otra clave |
 
 Pendiente: probar con **celulares reales** en otra red (datos móviles) el día del ensayo. El canal es el mismo que en la prueba anterior, pero no se ha ejecutado desde un teléfono.
+
+### Controles completos de las demostraciones en el remoto
+
+| Prueba | Resultado |
+|---|---|
+| Recorrido de las 29 diapositivas: controles que recibe el remoto | ✔ 16 diapositivas con controles: línea de tiempo (6), operaciones (5 ejemplos), leyes (2), división del bloque (2), subclaves (3), ronda (2), visualizador (16: Aleatorio, R1…R8, ½, Reiniciar, Ronda ⏮/⏭, Paso, Auto), ronda 1 (4), resumen (3), subclaves inversas (9), laboratorio (10: 4 ejemplos y 6 pasos), espacio de claves (2 deslizadores × −/+), capas (5), claves débiles (4), ataques (2 vistas y 9 filas), comparación (4 pestañas) |
+| Clic real en «Ronda ⏭» desde el remoto | ✔ Presentación en la ronda 2 (17 / 134). El remoto resalta R2 y muestra «17 / 134» |
+| «▷ Auto» desde el remoto | ✔ El remoto sigue la reproducción (33 → 38 en 3 s) y el botón cambia a «❚❚ Pausa». Un clic en «Pausa» la detiene |
+| Toques durante la reproducción automática | ✔ Los botones se actualizan en su sitio (el mismo elemento), así que un toque no se pierde |
+| Laboratorio desde el remoto: ejemplo «Todo ceros» → Ejecutar todo → Descifrar el resultado → Ejecutar todo | ✔ `0001 0001 0000 0000` (igual que OpenSSL) y «✓ Igual al original». «Descifrar» aparece desactivado cuando no aplica |
+| Deslizador «+ más» desde el remoto | ✔ 10^12 → 10^12.5 |
+| Pestaña «Historia» de la comparación | ✔ Cambia en la presentación y queda resaltada en el remoto |
+| Pruebas unitarias nuevas | ✔ Etiqueta que no coincide, control desactivado, índice fuera de rango, control de una diapositiva anterior y estados de demo que no invalidan la navegación |
+| Errores de consola con la sesión abierta, recorriendo todas las demos | 0 |
